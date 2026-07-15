@@ -421,3 +421,45 @@ textarea {
 .archive-list .archive-delete-button:hover {
   background: #ffe0dc;
 }
+
+.misc-add-row-button {
+  width: 100%;
+  height: 34px;
+  margin-top: 8px;
+  color: #21677f;
+  background: var(--blue-strip);
+  border: 1px dashed #9fd9eb;
+  border-radius: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.misc-add-row-button:hover {
+  background: #dff3fa;
+}
+
+/* Visually close completed or already-published campaigns. */
+.task-row.campaign-complete {
+  color: #a2a6aa;
+  background: #eef0f1;
+}
+
+.task-row.campaign-complete:hover {
+  background: #e7e9ea;
+}
+
+.task-row.campaign-complete strong,
+.task-row.campaign-complete .publish-date,
+.task-row.campaign-complete .progress-checks label,
+.task-row.campaign-complete .assignee-input {
+  color: #a2a6aa;
+}
+
+.task-row.campaign-complete .category-select,
+.task-row.campaign-complete .bgf-category,
+.task-row.campaign-complete .shooting-meta-pill,
+.task-row.campaign-complete input,
+.task-row.campaign-complete select {
+  opacity: 0.58;
+}
