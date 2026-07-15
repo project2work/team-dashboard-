@@ -276,7 +276,7 @@ function i(e){t({...r,note:e})}function a(e,n){t({...r,rows:r.rows.map(t=>t.id==
 (0,A.jsx)(`span`,{children:e.label},e.iso))}),
 (0,A.jsx)(`div`,{className:`schedule-timeline-body`,children:r.map(e=>
 (0,A.jsx)(`div`,{className:`schedule-timeline-row`,children:(e.schedule||[]).filter(e=>!Number.isNaN(new Date(e.date).getTime())).map((n,r)=>{let i=pn(mn(s,new Date(n.date))+1,1,l.length);return(0,A.jsx)(`button`,{className:`schedule-event-chip`,style:{gridColumn:i},type:`button`,onClick:()=>t(e),children:_t(n.label)},`${e.id}-${r}-${n.date}`)})},e.id))})]})})]})]})}function Ge({weeklyStatus:e,setWeeklyStatus:t,globalMemo:n,setGlobalMemo:r}){let[i,a]=(0,S.useState)(()=>Jt(new Date)),o=e[i]||qt(i),s=Object.values(e).sort((e,t)=>new Date(t.weekStart)-new Date(e.weekStart));(0,S.useEffect)(()=>{t(e=>e[i]?e:{...e,[i]:qt(i)})},[i,t]);
-function c(e){t(t=>({...t,[i]:{...t[i]||qt(i),...e,updatedAt:new Date().toISOString()}}))}function l(e,t){c({rows:{...o.rows||{},[e]:t}})}function u(e){a(ln(fn(new Date(i),e)))}return(0,A.jsxs)(`section`,{className:`weekly-page`,children:[
+function c(e){t(t=>({...t,[i]:{...t[i]||qt(i),...e,updatedAt:new Date().toISOString()}}))}function l(e,t){c({rows:{...o.rows||{},[e]:t}})}function u(e){a(ln(fn(new Date(i),e)))}function d(n){if(!window.confirm(`${Yt(n)} 아카이브를 삭제할까요?`))return;let r=Object.keys(e).filter(e=>e!==n).sort((e,t)=>new Date(t)-new Date(e));n===i&&a(r[0]||ln(fn(new Date(n),-7))),t(e=>{let t={...e};return delete t[n],t})}return(0,A.jsxs)(`section`,{className:`weekly-page`,children:[
 (0,A.jsxs)(`div`,{className:`weekly-toolbar`,children:[
 (0,A.jsxs)(`div`,{children:[
 (0,A.jsx)(`p`,{className:`eyebrow`,children:`Weekly report`}),
@@ -304,9 +304,11 @@ function c(e){t(t=>({...t,[i]:{...t[i]||qt(i),...e,updatedAt:new Date().toISOStr
 (0,A.jsx)(T,{size:18}),
 (0,A.jsx)(`h2`,{children:`주차별 아카이브`})]}),
 (0,A.jsx)(`div`,{className:`archive-list`,children:s.map(e=>
-(0,A.jsxs)(`button`,{className:e.weekStart===i?`active`:``,type:`button`,onClick:()=>a(e.weekStart),children:[
+(0,A.jsxs)(`div`,{className:`archive-item ${e.weekStart===i?`active`:``}`,children:[
+(0,A.jsxs)(`button`,{className:`archive-select-button`,type:`button`,onClick:()=>a(e.weekStart),children:[
 (0,A.jsx)(`strong`,{children:Yt(e.weekStart)}),
-(0,A.jsx)(`span`,{children:Zt(e)})]},e.weekStart))})]}),
+(0,A.jsx)(`span`,{children:Zt(e)})]}),
+(0,A.jsx)(`button`,{className:`archive-delete-button`,type:`button`,onClick:()=>d(e.weekStart),"aria-label":`${Yt(e.weekStart)} 삭제`,title:`삭제`,children:(0,A.jsx)(O,{size:15})})]},e.weekStart))})]}),
 (0,A.jsxs)(`section`,{className:`weekly-big-memo`,children:[
 (0,A.jsxs)(`div`,{className:`weekly-archive-title`,children:[
 (0,A.jsx)(E,{size:18}),
