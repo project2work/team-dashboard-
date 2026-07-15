@@ -1002,60 +1002,63 @@ window.INTRO_QUOTES = [
 ];
 
 (function () {
-  const STORAGE_KEY = "teamDashboardIntroQuoteRotationV1";
+  const ANCHOR_DATE = new Date(2026, 0, 5);
 
-  function shuffle(length, avoidFirst) {
+  function seededRandom(seed) {
+    let value = seed >>> 0;
+    return function () {
+      value = (value + 0x6d2b79f5) >>> 0;
+      let mixed = value;
+      mixed = Math.imul(mixed ^ (mixed >>> 15), mixed | 1);
+      mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
+      return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffledOrder(length, cycle) {
     const order = Array.from({ length }, (_, index) => index);
+    const random = seededRandom(0x51f15e ^ Math.imul(cycle + 1, 0x9e3779b1));
     for (let index = order.length - 1; index > 0; index -= 1) {
-      const randomIndex = Math.floor(Math.random() * (index + 1));
+      const randomIndex = Math.floor(random() * (index + 1));
       [order[index], order[randomIndex]] = [order[randomIndex], order[index]];
-    }
-    if (order.length > 1 && order[0] === avoidFirst) {
-      [order[0], order[1]] = [order[1], order[0]];
     }
     return order;
   }
 
-  function scheduleKey(now = new Date()) {
-    const date = new Date(now);
-    if (date.getHours() < 7) date.setDate(date.getDate() - 1);
+  function effectiveBusinessDate(now = new Date()) {
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (now.getHours() < 7) date.setDate(date.getDate() - 1);
     while (date.getDay() === 0 || date.getDay() === 6) {
       date.setDate(date.getDate() - 1);
     }
-    return [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, "0"),
-      String(date.getDate()).padStart(2, "0"),
-    ].join("-");
+    return date;
   }
 
-  function loadState() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-    } catch {
-      return null;
-    }
-  }
-
-  function selectQuote() {
-    const quotes = window.INTRO_QUOTES || [];
-    const key = scheduleKey();
-    let state = loadState();
-
-    if (!state || !Array.isArray(state.order) || state.order.length !== quotes.length) {
-      state = { key, order: shuffle(quotes.length), position: 0 };
-    } else if (state.key !== key) {
-      state.key = key;
-      state.position += 1;
-      if (state.position >= state.order.length) {
-        const previous = state.order[state.order.length - 1];
-        state.order = shuffle(quotes.length, previous);
-        state.position = 0;
+  function businessDayIndex(now = new Date()) {
+    const target = effectiveBusinessDate(now);
+    const cursor = new Date(ANCHOR_DATE);
+    let index = 0;
+    if (target >= cursor) {
+      while (cursor < target) {
+        cursor.setDate(cursor.getDate() + 1);
+        if (cursor.getDay() !== 0 && cursor.getDay() !== 6) index += 1;
+      }
+    } else {
+      while (cursor > target) {
+        cursor.setDate(cursor.getDate() - 1);
+        if (cursor.getDay() !== 0 && cursor.getDay() !== 6) index -= 1;
       }
     }
+    return index;
+  }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    return quotes[state.order[state.position]] || quotes[0];
+  function selectQuote(now = new Date()) {
+    const quotes = window.INTRO_QUOTES || [];
+    if (!quotes.length) return null;
+    const slot = businessDayIndex(now);
+    const cycle = Math.floor(slot / quotes.length);
+    const position = ((slot % quotes.length) + quotes.length) % quotes.length;
+    return quotes[shuffledOrder(quotes.length, cycle)[position]] || quotes[0];
   }
 
   function renderQuote(quote) {
@@ -1071,7 +1074,7 @@ window.INTRO_QUOTES = [
     return true;
   }
 
-  let currentKey = scheduleKey();
+  let currentKey = businessDayIndex();
   let currentQuote = selectQuote();
   const observer = new MutationObserver(() => {
     if (renderQuote(currentQuote)) observer.disconnect();
@@ -1080,7 +1083,7 @@ window.INTRO_QUOTES = [
   if (renderQuote(currentQuote)) observer.disconnect();
 
   setInterval(() => {
-    const nextKey = scheduleKey();
+    const nextKey = businessDayIndex();
     if (nextKey !== currentKey) {
       currentKey = nextKey;
       currentQuote = selectQuote();
