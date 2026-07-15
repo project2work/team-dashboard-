@@ -463,3 +463,66 @@ textarea {
 .task-row.campaign-complete select {
   opacity: 0.58;
 }
+
+/* Instagram publishing workflow */
+.instagram-modal {
+  width: min(980px, 100%);
+}
+
+.instagram-head,
+.instagram-row {
+  grid-template-columns: 96px minmax(210px, 1fr) minmax(310px, 1.35fr) 126px;
+}
+
+.instagram-head {
+  font-size: 11px;
+}
+
+.instagram-row > input,
+.instagram-row > select {
+  min-width: 0;
+  font-size: 11px;
+}
+
+.instagram-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 9px;
+}
+
+.instagram-progress label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #4c5359;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.instagram-progress input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  padding: 0;
+  accent-color: #3a90ff;
+}
+
+.instagram-row.is-done {
+  color: #9aa0a6;
+  background: #f5f7f8;
+  border-radius: 8px;
+}
+
+.instagram-row.is-done .instagram-progress label {
+  color: #9aa0a6;
+}
+
+.instagram-row.is-done > input,
+.instagram-row.is-done > select {
+  text-decoration: none;
+}
+
+.bgf-detail-input {
+  min-height: 220px;
+}

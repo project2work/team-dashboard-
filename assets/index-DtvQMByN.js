@@ -111,7 +111,7 @@ function Be(){let[e,t]=(0,S.useState)(()=>Qt()),[n,r]=(0,S.useState)(()=>$t()),[
 let de=(0,S.useMemo)(()=>e.map(e=>yt(e,n[e.id])),[e,n]),O=(0,S.useMemo)(()=>de.filter(e=>bt(e)&&e.coverageType===`촬영`&&e.shootingDate).map(e=>({id:`bgf-shoot-${e.id}`,date:un(e.shootingDate),type:`촬영`,title:e.shootingLocation?`BGF 촬영 - ${e.shootingLocation}`:`BGF 촬영`,readonly:!0})).filter(e=>e.date),[de]),k=(0,S.useMemo)(()=>{let e=new Map;return[...c,...O].forEach(t=>e.set(t.id,t)),[...e.values()]},[c,O]),
 me=(0,S.useMemo)(()=>{let e=new Map(Re.map(e=>[e.id,e]));return Object.keys(n).filter(e=>e.startsWith(`misc-`)).forEach(t=>{e.has(t)||e.set(t,{...Re[0],id:t})}),[...e.values()].map(e=>yt(e,n[e.id])).filter(e=>{let t=[e.brand,e.title,e.progressNote,e.assignee].some(e=>String(e||``).trim()),r=!Re.some(t=>t.id===e.id);return(t||r)&&(Et(e)||``).slice(0,7)===month})},[n,month]),
 he=(0,S.useMemo)(()=>{let e=b.trim().toLowerCase(),t=de.filter(e=>(e.campaignMonth||ln(Dt(e,new Date))).slice(0,7)===month);return e?t.filter(t=>[t.title,t.section,t.brand,t.product,t.platform,t.detail,t.assignee].join(` `).toLowerCase().includes(e)):t},[de,b,month]),
-ge=(0,S.useMemo)(()=>[...ye.map(e=>({title:e.section,items:he.filter(t=>t.section===e.section).sort((e,t)=>Pe.indexOf(e.category)-Pe.indexOf(t.category)||new Date(Et(e))-new Date(Et(t)))})),{title:Le,items:me}],[he,me]),_e=(0,S.useMemo)(()=>{let e=dn(new Date);return he.map(t=>({...t,dday:mn(e,new Date(Et(t)))})).filter(e=>e.dday>=0&&e.dday<=2).sort((e,t)=>e.dday-t.dday).slice(0,20)},[he]);
+ge=(0,S.useMemo)(()=>[...ye.map(e=>({title:e.section,items:he.filter(t=>t.section===e.section).sort((e,t)=>Pe.indexOf(e.category)-Pe.indexOf(t.category)||new Date(Et(e))-new Date(Et(t)))})),{title:Le,items:me}],[he,me]),_e=(0,S.useMemo)(()=>{let e=dn(new Date),t=he.map(t=>{let n=bt(t),r=n?new Date(t.publishDate):new Date(Et(t)),i=Number.isNaN(r.getTime())?``:`${r.getMonth()+1}/${r.getDate()}`;return{...t,dday:Number.isNaN(r.getTime())?NaN:mn(e,r),urgentType:n?`bgf`:`dongguk`,urgentTitle:n?`[BGF LIVE] ${i} ${t.contentCategory||`BGF LIVE`} ${Wt(t.title)}`:`[${t.category||`구분`}] ${Wt(t.title)}`,urgentMeta:n?`발행`:Ft(t)}}),n=(g.rows||[]).map(t=>{let n=un(t.publishDate),r=new Date(n),i=Number.isNaN(r.getTime())?``:`${r.getMonth()+1}/${r.getDate()}`;return{id:`instagram-urgent-${t.id}`,dday:Number.isNaN(r.getTime())?NaN:mn(e,r),urgentType:`instagram`,urgentTitle:`[BGF LIVE] ${i} 인스타그램 콘텐츠`,urgentMeta:`발행`}});return[...t,...n].filter(e=>e.dday>=0&&e.dday<=2).sort((e,t)=>e.dday-t.dday).slice(0,20)},[he,g]);
 function ve(e,t){e?.preventDefault(),e?.stopPropagation(),ke(t)}async function ke(source){if(!se.current){let sources=source?ye.filter(e=>e.section===source):ye,label=source?.includes(`동국`)?`동국뷰티`:source?.includes(`BGF`)?`BGF`:`대시보드`;se.current=!0,T(!0),D({type:`pending`,text:`${month.replace(`-`,`.`)} ${label} 새로고침 중`});try{let r=[];for(let e of sources)r.push(...await $e(e));r=r.map(t=>({...t,campaignMonth:e.find(e=>e.id===t.id)?.campaignMonth||t.campaignMonth}));let i=r.filter(e=>(e.campaignMonth||ln(Dt(e,new Date))).slice(0,7)===month),a=Gt([...e.filter(e=>(e.campaignMonth||ln(Dt(e,new Date))).slice(0,7)!==month||source&&e.section!==source),...i]);if(!i.length)throw Error(`No rows for selected month`);t(a),x(``),localStorage.setItem(be,JSON.stringify(a)),D({type:`ok`,text:`${month.replace(`-`,`.`)} ${label} 업데이트 완료: ${i.length}개`})}catch(n){console.warn(`Sheet refresh failed`,n),D({type:`bad`,text:`${label} 새로고침 실패: 기존 데이터 유지`})}finally{se.current=!1,T(!1)}}}function Ae(e,t){r(n=>({...n,[e]:{...n[e]||{},...t}}))}function je(e,t){Ae(e,t),ne(n=>n?.id===e?yt(n,t):n)}function Me(e,t){a(i.map(n=>n.id===e?{...n,...t}:n))}function Ne(e){a([...i,{id:crypto.randomUUID(),done:!1,...e}])}function Fe(e){a(i.filter(t=>t.id!==e))}return ae?
 (0,A.jsx)(Ve,{onOpen:()=>oe(!1)}):
 (0,A.jsxs)(`div`,{className:`dashboard-shell ${v===`dashboard`?``:`single-page-shell`}`,children:[
@@ -133,10 +133,10 @@ function ve(e,t){e?.preventDefault(),e?.stopPropagation(),ke(t)}async function k
 (0,A.jsx)(ue,{size:16}),
 (0,A.jsx)(`strong`,{children:`마감 임박`})]}),
 (0,A.jsx)(`div`,{className:`urgent-list`,children:_e.length?_e.map(e=>
-(0,A.jsxs)(`button`,{className:`urgent-item`,type:`button`,onClick:()=>ne(e),children:[
+(0,A.jsxs)(`button`,{className:`urgent-item`,type:`button`,onClick:()=>e.urgentType!==`instagram`&&ne(e),children:[
 (0,A.jsx)(`span`,{children:gn(e.dday)}),
-(0,A.jsx)(`strong`,{children:Wt(e.title)}),
-(0,A.jsx)(`em`,{children:Ft(e)})]},e.id)):
+(0,A.jsx)(`strong`,{children:e.urgentTitle||Wt(e.title)}),
+(0,A.jsx)(`em`,{children:e.urgentMeta||Ft(e)})]},e.id)):
 (0,A.jsx)(`span`,{className:`muted`,children:`D-DAY부터 D-2까지 마감되는 일정이 없습니다.`})})]}),
 (0,A.jsxs)(`div`,{className:`search-row`,children:[
 (0,A.jsxs)(`label`,{children:[
@@ -238,7 +238,7 @@ function ve(e,t){e?.preventDefault(),e?.stopPropagation(),ke(t)}async function k
 (0,A.jsx)(`select`,{className:`assignee-input`,value:e.assignee||``,onChange:t=>n(e.id,{assignee:t.target.value}),onClick:e=>e.stopPropagation(),children:Ne.map(e=>
 (0,A.jsx)(`option`,{value:e.value,children:e.label},e.value))})]},e.id)),!e.items.length&&
 (0,A.jsx)(`div`,{className:`empty-row`,children:`표시할 캠페인이 없습니다.`})]})]})}function Ue({plan:e,setPlan:t,onClose:n}){let r=e?.rows?.length?e:Ae;
-function i(e){t({...r,note:e})}function a(e,n){t({...r,rows:r.rows.map(t=>t.id===e?{...t,...n}:t)})}return(0,A.jsx)(`div`,{className:`modal-backdrop instagram-backdrop`,role:`presentation`,onMouseDown:n,children:
+function i(e){t({...r,note:e})}function a(e,n){t({...r,rows:r.rows.map(t=>t.id===e?{...t,...n}:t)})}function o(e){return Number.isInteger(e.progressIndex)?e.progressIndex:e.done?2:-1}return(0,A.jsx)(`div`,{className:`modal-backdrop instagram-backdrop`,role:`presentation`,onMouseDown:n,children:
 (0,A.jsxs)(`section`,{className:`instagram-modal`,role:`dialog`,"aria-modal":`true`,"aria-label":`Instagram`,onMouseDown:e=>e.stopPropagation(),children:[
 (0,A.jsx)(`button`,{className:`close-button`,type:`button`,onClick:n,"aria-label":`닫기`,children:
 (0,A.jsx)(k,{})}),
@@ -249,14 +249,17 @@ function i(e){t({...r,note:e})}function a(e,n){t({...r,rows:r.rows.map(t=>t.id==
 (0,A.jsx)(`textarea`,{value:r.note||``,onChange:e=>i(e.target.value),placeholder:`참고사항을 자유롭게 기재`,rows:3})]}),
 (0,A.jsxs)(`div`,{className:`instagram-table`,children:[
 (0,A.jsxs)(`div`,{className:`instagram-head`,children:[
-(0,A.jsx)(`span`,{children:`체크`}),
 (0,A.jsx)(`span`,{children:`발행일`}),
 (0,A.jsx)(`span`,{children:`콘텐츠명`}),
+(0,A.jsx)(`span`,{children:`진행 현황`}),
 (0,A.jsx)(`span`,{children:`담당자`})]}),r.rows.slice(0,4).map(e=>
-(0,A.jsxs)(`div`,{className:`instagram-row ${e.done?`is-done`:``}`,children:[
-(0,A.jsx)(`input`,{type:`checkbox`,checked:e.done,onChange:t=>a(e.id,{done:t.target.checked})}),
+(0,A.jsxs)(`div`,{className:`instagram-row ${o(e)>=2?`is-done`:``}`,children:[
 (0,A.jsx)(`input`,{value:e.publishDate||``,onChange:t=>a(e.id,{publishDate:t.target.value}),placeholder:`7/24`}),
 (0,A.jsx)(`input`,{value:e.title||``,onChange:t=>a(e.id,{title:t.target.value}),placeholder:`콘텐츠명`}),
+(0,A.jsx)(`div`,{className:`instagram-progress`,children:[`콘텐츠 제작`,`실행안 전달`,`발행 완료`].map((t,n)=>
+(0,A.jsxs)(`label`,{children:[
+(0,A.jsx)(`input`,{type:`checkbox`,checked:n<=o(e),onChange:r=>{let i=r.target.checked,s=o(e);i&&n===s+1?a(e.id,{progressIndex:n,done:n===2}):!i&&n===s&&a(e.id,{progressIndex:n-1,done:!1})}}),
+(0,A.jsx)(`span`,{children:t})]},t))}),
 (0,A.jsx)(`select`,{value:e.assignee||``,onChange:t=>a(e.id,{assignee:t.target.value}),children:Ne.map(e=>
 (0,A.jsx)(`option`,{value:e.value,children:e.label},e.value))})]},e.id))]})]})})}function We({tasks:e,onSelect:t}){let n=(0,S.useRef)(null),r=e.filter(e=>!Number.isNaN(new Date(Et(e)).getTime())),i=r.flatMap(e=>(e.schedule||[]).map(e=>new Date(e.date)).filter(e=>!Number.isNaN(e.getTime()))),a=i.length?new Date(Math.min(...i)):new Date,o=i.length?new Date(Math.max(...i)):new Date(a),s=fn(a,-2),c=fn(o,2),l=Ot(s,c),u=l.findIndex(e=>e.iso===ln(new Date)),d=`${Math.max(900,l.length*58)}px`;(0,S.useEffect)(()=>{let e=n.current;if(!e||u<0)return;let t=window.requestAnimationFrame(()=>{let t=e.scrollWidth/l.length;e.scrollLeft=Math.max(0,t*u-e.clientWidth/2+t/2)});return()=>window.cancelAnimationFrame(t)},[l.length,u]);return(0,A.jsxs)(`section`,{className:`dongguk-schedule-board`,children:[
 (0,A.jsxs)(`div`,{className:`schedule-board-head`,children:[
@@ -416,11 +419,8 @@ function o(t,r){n(e.id,{dueDates:{...e.dueDates||{},[_t(t)]:r}})}return(0,A.jsx)
 r&&
 (0,A.jsxs)(`div`,{className:`bgf-detail-panel`,children:[
 (0,A.jsxs)(`div`,{children:[
-(0,A.jsx)(`span`,{children:`키워드`}),
-(0,A.jsx)(`strong`,{children:at(e.keyword)})]}),
-(0,A.jsxs)(`div`,{children:[
 (0,A.jsx)(`span`,{children:`콘텐츠 내용`}),
-(0,A.jsx)(`textarea`,{className:`bgf-detail-input`,value:e.detail||``,onChange:t=>n(e.id,{detail:t.target.value}),placeholder:`콘텐츠 내용을 입력하세요`,rows:2})]})]}),
+(0,A.jsx)(`textarea`,{className:`bgf-detail-input`,value:e.detail||``,onChange:t=>n(e.id,{detail:t.target.value}),placeholder:`콘텐츠 내용을 입력하세요`,rows:8})]})]}),
 (0,A.jsxs)(`label`,{className:`issue-field`,children:[
 (0,A.jsx)(`span`,{children:`📌이슈사항`}),
 (0,A.jsx)(`textarea`,{value:e.issueNote||``,onChange:t=>n(e.id,{issueNote:t.target.value}),placeholder:`이슈사항, 확인 필요 내용, 피드백 등을 자유롭게 기재`,rows:5})]}),i&&
