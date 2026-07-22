@@ -4,6 +4,7 @@ const DASHBOARD_MODULE = "./assets/index-DtvQMByN.js?v=20260722-1";
 const COLLECTION = "team-dashboard-state";
 const BACKUP_KEY = "teamDashboardBackupBeforeSharedV1";
 const LATEST_BACKUP_KEY = "teamDashboardBackupLatestV1";
+const sheetIdAliases = new Map();
 const SHARED_KEYS = [
   "teamDashboardSheetSnapshotV5",
   "teamDashboardManualStateV2",
@@ -76,6 +77,141 @@ function mergeArrays(localItems, remoteItems) {
   return [...keyed.values(), ...unkeyed.values()];
 }
 
+function normalizeCampaignText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[\[\](){}]/g, "")
+    .trim();
+}
+
+function campaignSignature(item) {
+  if (!isRecord(item)) return "";
+  const rawId = String(item.id || "").trim();
+  const idParts = rawId.split("|").map(normalizeCampaignText).filter(Boolean);
+  if (idParts.length >= 4) {
+    // 첫 조각은 같은 시트를 가리키는 이름이 버전마다 달라질 수 있으므로 제외합니다.
+    // 행 번호와 나머지 원본 값은 유지해 동일 제품의 서로 다른 인플루언서를 구분합니다.
+    return `sheet-row|${idParts.slice(1).join("|")}`;
+  }
+
+  const section = normalizeCampaignText(item.section);
+  const scheduledMonth = Array.isArray(item.schedule)
+    ? item.schedule.map(entry => String(entry?.date || "").slice(0, 7)).find(Boolean)
+    : "";
+  const month = normalizeCampaignText(item.campaignMonth || String(item.publishDate || "").slice(0, 7) || scheduledMonth);
+  const category = normalizeCampaignText(item.category || item.platform || item.contentCategory);
+  const product = normalizeCampaignText(item.product);
+  const detail = normalizeCampaignText(item.detail);
+  const title = normalizeCampaignText(item.title);
+  const accountText = [item.title, item.product, item.detail, item.keyword]
+    .map(value => String(value || ""))
+    .join(" ");
+  const account = accountText.match(/@[a-z0-9._-]+/i)?.[0]?.toLowerCase() || "";
+  if (!section || (!product && !title)) return "";
+  return [section, month, category, account || product || title, detail].join("|");
+}
+
+function mergeSchedule(localSchedule, remoteSchedule) {
+  const merged = new Map();
+  [...(Array.isArray(localSchedule) ? localSchedule : []), ...(Array.isArray(remoteSchedule) ? remoteSchedule : [])]
+    .forEach(entry => {
+      if (!isRecord(entry)) return;
+      const key = normalizeCampaignText(entry.label) || JSON.stringify(entry);
+      const previous = merged.get(key) || {};
+      merged.set(key, { ...previous, ...entry });
+    });
+  return [...merged.values()];
+}
+
+function mergeCampaignEntry(localEntry, remoteEntry, canonicalId) {
+  const merged = { ...localEntry };
+  Object.entries(remoteEntry).forEach(([key, value]) => {
+    const hasUsefulValue = Array.isArray(value)
+      ? value.length > 0
+      : value !== "" && value !== null && value !== undefined;
+    if (hasUsefulValue) merged[key] = value;
+  });
+  merged.id = canonicalId;
+  merged.schedule = mergeSchedule(localEntry.schedule, remoteEntry.schedule);
+  const progressValues = [localEntry.completedProgressIndex, remoteEntry.completedProgressIndex]
+    .filter(value => Number.isInteger(value));
+  if (progressValues.length) merged.completedProgressIndex = Math.max(...progressValues);
+  return merged;
+}
+
+function mergeSheetItems(localItems, remoteItems) {
+  sheetIdAliases.clear();
+  const campaigns = new Map();
+  const unkeyed = new Map();
+
+  const addItem = (item, remote = false) => {
+    const signature = campaignSignature(item);
+    if (!signature) {
+      let fallback;
+      try {
+        fallback = JSON.stringify(item);
+      } catch {
+        fallback = String(item);
+      }
+      unkeyed.set(fallback, item);
+      return;
+    }
+
+    const previous = campaigns.get(signature);
+    if (!previous) {
+      campaigns.set(signature, item);
+      return;
+    }
+
+    const previousId = previous?.id ? String(previous.id) : "";
+    const incomingId = item?.id ? String(item.id) : "";
+    const canonicalId = remote && incomingId ? incomingId : (previousId || incomingId);
+    if (previousId && previousId !== canonicalId) sheetIdAliases.set(previousId, canonicalId);
+    if (incomingId && incomingId !== canonicalId) sheetIdAliases.set(incomingId, canonicalId);
+    campaigns.set(signature, mergeCampaignEntry(previous, item, canonicalId));
+  };
+
+  localItems.forEach(item => addItem(item, false));
+  remoteItems.forEach(item => addItem(item, true));
+  return [...campaigns.values(), ...unkeyed.values()];
+}
+
+function resolveSheetId(id) {
+  let current = String(id || "");
+  const visited = new Set();
+  while (sheetIdAliases.has(current) && !visited.has(current)) {
+    visited.add(current);
+    current = sheetIdAliases.get(current);
+  }
+  return current;
+}
+
+function remapManualState(entries) {
+  const result = {};
+  Object.entries(entries).forEach(([id, entry]) => {
+    const canonicalId = resolveSheetId(id) || id;
+    const previous = result[canonicalId];
+    if (!isRecord(previous) || !isRecord(entry)) {
+      result[canonicalId] = entry;
+      return;
+    }
+    result[canonicalId] = {
+      ...previous,
+      ...entry,
+      dueDates: {
+        ...(isRecord(previous.dueDates) ? previous.dueDates : {}),
+        ...(isRecord(entry.dueDates) ? entry.dueDates : {})
+      },
+      completedProgressIndex: Math.max(
+        Number.isInteger(previous.completedProgressIndex) ? previous.completedProgressIndex : -1,
+        Number.isInteger(entry.completedProgressIndex) ? entry.completedProgressIndex : -1
+      )
+    };
+  });
+  return result;
+}
+
 function mergeRecordMap(localValue, remoteValue, nestedKeys = []) {
   const result = { ...localValue };
   Object.entries(remoteValue).forEach(([entryKey, remoteEntry]) => {
@@ -100,6 +236,14 @@ function mergeRecordMap(localValue, remoteValue, nestedKeys = []) {
 }
 
 function mergeSharedValue(key, localRaw, remoteRaw) {
+  if (key === "teamDashboardSheetSnapshotV5") {
+    const localItems = parseJson(localRaw, []);
+    const remoteItems = parseJson(remoteRaw, []);
+    if (Array.isArray(localItems) && Array.isArray(remoteItems)) {
+      return JSON.stringify(mergeSheetItems(localItems, remoteItems));
+    }
+  }
+
   if (remoteRaw === null || remoteRaw === undefined) return localRaw;
   if (localRaw === null || localRaw === undefined) return remoteRaw;
 
@@ -112,7 +256,6 @@ function mergeSharedValue(key, localRaw, remoteRaw) {
   if (localValue === null || remoteValue === null) return remoteRaw || localRaw;
 
   if ([
-    "teamDashboardSheetSnapshotV5",
     "teamDashboardChecksV2",
     "teamDashboardManualEventsV1",
     "teamDashboardResourcesV1"
@@ -121,7 +264,7 @@ function mergeSharedValue(key, localRaw, remoteRaw) {
   }
 
   if (key === "teamDashboardManualStateV2" && isRecord(localValue) && isRecord(remoteValue)) {
-    return JSON.stringify(mergeRecordMap(localValue, remoteValue, ["dueDates"]));
+    return JSON.stringify(remapManualState(mergeRecordMap(localValue, remoteValue, ["dueDates"])));
   }
 
   if (key === "teamDashboardWeeklyStatusV1" && isRecord(localValue) && isRecord(remoteValue)) {
