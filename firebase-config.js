@@ -1,49 +1,10 @@
-# 로그인 없는 자동 공동 저장 연결
-
-사이트 방문자는 로그인 화면을 보지 않습니다. 브라우저가 Firebase 익명 인증으로 자동 연결하고, 저장된 내용과 수정 내용이 다른 컴퓨터에도 반영됩니다.
-
-## 기존 자료를 안전하게 옮기는 순서
-
-1. GitHub에 새 파일을 업로드한 뒤 배포가 끝날 때까지 기다립니다.
-2. 반드시 현재 자료가 가장 많이 입력되어 있는 컴퓨터와 같은 브라우저에서 사이트를 먼저 엽니다.
-3. 화면에 `기존 자료 보존 후 공동 저장 연결됨` 안내가 뜨는지 확인합니다.
-4. 그 다음부터 다른 컴퓨터에서 사이트를 엽니다.
-
-첫 연결 직전에 브라우저에 있던 자료는 자동 백업됩니다. 기존 캠페인, 체크 상태, 담당자, 별건 캠페인, 체크리스트, 주간 아카이브와 메모는 공용 데이터에 합쳐집니다. 첫 연결 전에는 해당 사이트의 쿠키나 사이트 데이터를 삭제하지 마세요.
-
-## 1. Firebase 프로젝트 만들기
-
-1. https://console.firebase.google.com/ 접속
-2. `프로젝트 추가` 선택
-3. 프로젝트 이름 입력 후 생성
-4. Google 애널리틱스는 사용하지 않아도 됩니다.
-
-## 2. 웹 앱 등록
-
-1. 프로젝트 개요에서 `</>` 웹 아이콘 선택
-2. 앱 이름 입력 후 등록
-3. 표시되는 `firebaseConfig` 값을 복사
-4. 이 폴더의 `firebase-config.js`에서 `여기에 ...` 값을 복사한 값으로 교체
-
-## 3. 익명 인증 켜기
-
-1. Firebase 메뉴에서 `Authentication` 선택
-2. `시작하기` 선택
-3. `Sign-in method`에서 `익명` 선택
-4. 사용 설정 후 저장
-
-## 4. Firestore 만들기
-
-1. Firebase 메뉴에서 `Firestore Database` 선택
-2. `데이터베이스 만들기` 선택
-3. 위치 선택 후 생성
-4. `규칙` 탭에서 이 폴더의 `firestore.rules` 내용을 전부 붙여넣기
-5. `게시` 선택
-
-## 5. GitHub에 업로드
-
-이 폴더 안의 파일과 `assets` 폴더를 GitHub 저장소 최상단에 업로드합니다. 배포가 완료되면 위의 ‘기존 자료를 안전하게 옮기는 순서’를 따릅니다.
-
-## 주의
-
-로그인 화면은 없지만 사이트 주소를 아는 방문자는 익명 계정으로 데이터를 수정할 수 있습니다. 민감한 정보는 입력하지 마세요.
+// Firebase 콘솔 > 프로젝트 설정 > 내 앱 > SDK 설정 및 구성에서 복사하세요.
+// 이 값은 웹앱 연결 정보이며 GitHub Pages에 포함되는 공개 설정입니다.
+export const firebaseConfig = {
+  apiKey: "AIzaSyBet6uo2rmxHypoflk3gY0VO9xIC9w-sYc",
+  authDomain: "team-dashboard-35abd.firebaseapp.com",
+  projectId: "team-dashboard-35abd",
+  storageBucket: "team-dashboard-35abd.firebasestorage.app",
+  messagingSenderId: "745675155367",
+  appId: "1:745675155367:web:e9f3030f77afe7563eb882"
+};
