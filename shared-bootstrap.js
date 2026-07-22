@@ -2,6 +2,7 @@ import { firebaseConfig } from "./firebase-config.js?v=20260722-1";
 
 const DASHBOARD_MODULE = "./assets/index-DtvQMByN.js?v=20260722-1";
 const COLLECTION = "team-dashboard-state";
+const SHARED_LOGIN_EMAIL = "dashboard@project2work.com";
 const BACKUP_KEY = "teamDashboardBackupBeforeSharedV1";
 const LATEST_BACKUP_KEY = "teamDashboardBackupLatestV1";
 const sheetIdAliases = new Map();
@@ -36,6 +37,80 @@ function showStatus(message, type = "ok") {
   badge.className = `shared-sync-status ${type}`;
   badge.textContent = message;
   window.setTimeout(() => badge.classList.add("is-quiet"), 2400);
+}
+
+function waitForInitialAuth(authSdk, auth) {
+  return new Promise(resolve => {
+    let unsubscribe = () => {};
+    unsubscribe = authSdk.onAuthStateChanged(auth, user => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
+
+async function requireSharedPassword(authSdk, auth) {
+  await authSdk.setPersistence(auth, authSdk.browserLocalPersistence);
+  const currentUser = await waitForInitialAuth(authSdk, auth);
+  if (currentUser && !currentUser.isAnonymous && currentUser.email === SHARED_LOGIN_EMAIL) {
+    return currentUser;
+  }
+  if (currentUser) await authSdk.signOut(auth);
+
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.className = "shared-login-overlay";
+    overlay.innerHTML = `
+      <form class="shared-login-card" autocomplete="on">
+        <div class="shared-login-folder" aria-hidden="true">📁</div>
+        <h1>Team Dashboard</h1>
+        <p>공용 비밀번호를 입력해주세요.</p>
+        <label class="shared-login-label" for="shared-dashboard-password">비밀번호</label>
+        <input
+          id="shared-dashboard-password"
+          class="shared-login-input"
+          type="password"
+          autocomplete="current-password"
+          placeholder="비밀번호 입력"
+          required
+        />
+        <button class="shared-login-button" type="submit">들어가기</button>
+        <p class="shared-login-error" role="alert" aria-live="polite"></p>
+      </form>
+    `;
+    document.body.appendChild(overlay);
+
+    const form = overlay.querySelector("form");
+    const input = overlay.querySelector("input");
+    const button = overlay.querySelector("button");
+    const errorText = overlay.querySelector(".shared-login-error");
+    input.focus();
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const password = input.value;
+      if (!password) return;
+
+      button.disabled = true;
+      button.textContent = "확인 중...";
+      errorText.textContent = "";
+      try {
+        const credential = await authSdk.signInWithEmailAndPassword(auth, SHARED_LOGIN_EMAIL, password);
+        overlay.classList.add("is-complete");
+        window.setTimeout(() => overlay.remove(), 180);
+        resolve(credential.user);
+      } catch (error) {
+        console.error("공용 비밀번호 확인 실패", error);
+        input.select();
+        errorText.textContent = error?.code === "auth/too-many-requests"
+          ? "시도 횟수가 많습니다. 잠시 후 다시 시도해주세요."
+          : "비밀번호가 맞지 않습니다.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "들어가기";
+      }
+    });
+  });
 }
 
 function parseJson(value, fallback) {
@@ -305,7 +380,7 @@ if (!configured) {
 
     const app = appSdk.initializeApp(firebaseConfig);
     const auth = authSdk.getAuth(app);
-    await authSdk.signInAnonymously(auth);
+    await requireSharedPassword(authSdk, auth);
 
     const db = storeSdk.getFirestore(app);
     const stateCollection = storeSdk.collection(db, COLLECTION);
