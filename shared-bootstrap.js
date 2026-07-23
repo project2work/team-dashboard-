@@ -450,18 +450,33 @@ if (!configured) {
     SHARED_KEYS.forEach(key => {
       const localValue = localStateBeforeSync[key] ?? null;
       const remoteValue = remoteState.get(key) ?? null;
-      const mergedValue = mergeSharedValue(key, localValue, remoteValue);
-      if (mergedValue === null || mergedValue === undefined) return;
+      // 공용 데이터가 있으면 그것을 최신 원본으로 사용합니다.
+      // 로컬과 매번 합치면 다른 컴퓨터의 오래된 항목이 삭제 후 다시 살아날 수 있습니다.
+      const sharedValue = remoteValue !== null
+        ? (key === "teamDashboardSheetSnapshotV5"
+            ? mergeSharedValue(key, null, remoteValue)
+            : remoteValue)
+        : localValue;
+      if (sharedValue === null || sharedValue === undefined) return;
 
-      nativeSetItem.call(localStorage, key, mergedValue);
-      if (mergedValue !== remoteValue) {
-        mergedWrites.push(writeSharedValue(key, mergedValue));
+      nativeSetItem.call(localStorage, key, sharedValue);
+      if (sharedValue !== remoteValue) {
+        mergedWrites.push(writeSharedValue(key, sharedValue));
       }
     });
     applyingRemote = false;
     await Promise.all(mergedWrites);
 
     await loadDashboard();
+    // 빈 배열도 유효한 공용 상태입니다. 앱의 기본 예시 항목이 잠시 생성되더라도
+    // 초기 공용 값을 다시 전달해 전체 삭제 상태까지 정확히 반영합니다.
+    window.setTimeout(() => {
+      remoteState.forEach((value, key) => {
+        window.dispatchEvent(new CustomEvent("dashboard-shared-state", {
+          detail: { key, value }
+        }));
+      });
+    }, 0);
     showStatus(Object.keys(localStateBeforeSync).length
       ? "기존 자료 보존 후 공동 저장 연결됨"
       : "공동 저장 연결됨");
