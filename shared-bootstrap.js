@@ -1,6 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js?v=20260722-1";
 
-const DASHBOARD_MODULE = "./assets/index-DtvQMByN.js?v=20260722-1";
+const DASHBOARD_MODULE = "./assets/index-DtvQMByN.js?v=20260731-3";
 const COLLECTION = "team-dashboard-state";
 const SHARED_LOGIN_EMAIL = "dashboard@project2work.com";
 const BACKUP_KEY = "teamDashboardBackupBeforeSharedV1";
@@ -15,7 +15,8 @@ const SHARED_KEYS = [
   "teamDashboardWeeklyStatusV1",
   "teamDashboardWeeklyGlobalMemoV1",
   "teamDashboardResourcesV1",
-  "teamDashboardInstagramPlanV1"
+  "teamDashboardInstagramPlanV1",
+  "teamDashboardInstagramPlansByMonthV2"
 ];
 
 const configured = firebaseConfig.apiKey &&
