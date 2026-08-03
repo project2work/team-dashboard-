@@ -778,6 +778,34 @@ textarea {
   border: 1px solid #1684b8;
 }
 
+.bgf-publish-date-editor {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 180px);
+  align-items: center;
+  gap: 10px;
+}
+
+.bgf-publish-date-editor input {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #e7ecef;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.progress-date-range-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f7fafb;
+}
+
+.progress-date-range-row label {
+  grid-template-columns: minmax(82px, 1fr) minmax(130px, 150px);
+}
+
 @media (max-width: 640px) {
   .misc-modal-grid {
     grid-template-columns: 1fr;
@@ -785,5 +813,9 @@ textarea {
 
   .misc-modal-wide {
     grid-column: auto;
+  }
+
+  .progress-date-range-row {
+    grid-template-columns: 1fr;
   }
 }
