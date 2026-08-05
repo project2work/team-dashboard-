@@ -793,6 +793,43 @@ textarea {
   background: #fff;
 }
 
+.bgf-instagram-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 34px;
+  padding: 6px 10px;
+  color: #a92f6b;
+  font-size: 13px;
+  font-weight: 800;
+  background: #fde7f2;
+  border-radius: 8px;
+}
+
+.bgf-instagram-toggle input {
+  width: 15px;
+  height: 15px;
+  accent-color: #e25293;
+}
+
+.bgf-instagram-symbol {
+  flex: none;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  padding: 3px;
+  background: #fde7f2;
+  border-radius: 6px;
+}
+
+.bgf-instagram-symbol-inline {
+  width: 18px;
+  height: 18px;
+  margin-left: 5px;
+}
+
 .progress-date-range-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

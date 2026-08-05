@@ -571,7 +571,7 @@ function Be(){let[e,t]=(0,S.useState)(()=>Qt()),[n,r]=(0,S.useState)(()=>$t()),[
 let instagramPlan=(0,S.useMemo)(()=>In(g,month),[g,month]),de=(0,S.useMemo)(()=>e.map(e=>yt(e,n[e.id])),[e,n]),O=(0,S.useMemo)(()=>de.filter(e=>bt(e)&&e.coverageType===`촬영`&&e.shootingDate).map(e=>({id:`bgf-shoot-${e.id}`,date:un(e.shootingDate),type:`촬영`,title:e.shootingLocation?`BGF 촬영 - ${e.shootingLocation}`:`BGF 촬영`,readonly:!0})).filter(e=>e.date),[de]),k=(0,S.useMemo)(()=>{let e=new Map;return[...c,...O].forEach(t=>e.set(t.id,t)),[...e.values()]},[c,O]),
 me=(0,S.useMemo)(()=>{let e=new Map(Re.map(e=>[e.id,e]));return Object.keys(n).filter(e=>e.startsWith(`misc-`)).forEach(t=>{e.has(t)||e.set(t,{...Re[0],id:t})}),[...e.values()].map(e=>yt(e,n[e.id])).filter(e=>{if(e.deleted)return!1;let t=[e.brand,e.title,e.detail,e.progressNote,e.assignee].some(e=>String(e||``).trim()),r=!Re.some(t=>t.id===e.id);return t||r})},[n]),
 he=(0,S.useMemo)(()=>{let e=b.trim().toLowerCase(),t=de.filter(e=>(e.campaignMonth||ln(Dt(e,new Date))).slice(0,7)===month);return e?t.filter(t=>[t.title,t.section,t.brand,t.product,t.platform,t.detail,t.assignee].join(` `).toLowerCase().includes(e)):t},[de,b,month]),
-ge=(0,S.useMemo)(()=>[...ye.map(e=>({title:e.section,items:he.filter(t=>t.section===e.section).sort((e,t)=>Pe.indexOf(e.category)-Pe.indexOf(t.category)||new Date(Et(e))-new Date(Et(t)))})),{title:Le,items:me}],[he,me]),_e=(0,S.useMemo)(()=>{let e=dn(new Date),t=he.map(t=>{let n=bt(t),r=n?new Date(t.publishDate):new Date(Et(t)),i=Number.isNaN(r.getTime())?``:`${r.getMonth()+1}/${r.getDate()}`;return{...t,dday:Number.isNaN(r.getTime())?NaN:mn(e,r),urgentType:n?`bgf`:`dongguk`,urgentTitle:n?`[BGF LIVE] ${i} ${t.contentCategory||`BGF LIVE`} ${Wt(t.title)}`:`[${t.category||`구분`}] ${Wt(t.title)}`,urgentMeta:n?`발행`:Ft(t)}}),n=(instagramPlan.rows||[]).map(t=>{let n=un(t.publishDate),r=new Date(n),i=Number.isNaN(r.getTime())?``:`${r.getMonth()+1}/${r.getDate()}`;return{id:`instagram-urgent-${t.id}`,dday:Number.isNaN(r.getTime())?NaN:mn(e,r),urgentType:`instagram`,urgentTitle:`[BGF LIVE] ${i} 인스타그램 콘텐츠`,urgentMeta:`발행`}});return[...t,...n].filter(e=>e.dday>=0&&e.dday<=2).sort((e,t)=>e.dday-t.dday).slice(0,20)},[he,instagramPlan]);
+ge=(0,S.useMemo)(()=>[...ye.map(e=>({title:e.section,items:he.filter(t=>t.section===e.section).sort((e,t)=>Pe.indexOf(e.category)-Pe.indexOf(t.category)||new Date(Et(e))-new Date(Et(t)))})),{title:Le,items:me}],[he,me]),_e=(0,S.useMemo)(()=>{let e=dn(new Date),t=he.map(t=>{let n=bt(t),r=n?new Date(t.publishDate):new Date(Et(t)),i=Number.isNaN(r.getTime())?``:`${r.getMonth()+1}/${r.getDate()}`;return{...t,dday:Number.isNaN(r.getTime())?NaN:mn(e,r),urgentType:n?`bgf`:`dongguk`,urgentTitle:n?`[BGF LIVE] ${i} ${t.contentCategory||`BGF LIVE`} ${Wt(t.title)}`:`[${t.category||`구분`}] ${Wt(t.title)}`,urgentMeta:n?`발행`:Ft(t)}});return t.filter(e=>e.dday>=0&&e.dday<=2).sort((e,t)=>e.dday-t.dday).slice(0,20)},[he]);
 function ve(e,t){e?.preventDefault(),e?.stopPropagation(),ke(t)}async function ke(source){if(!se.current){let sources=source?ye.filter(e=>e.section===source):ye,label=source?.includes(`동국`)?`동국뷰티`:source?.includes(`BGF`)?`BGF`:`대시보드`;se.current=!0,T(!0),D({type:`pending`,text:`${month.replace(`-`,`.`)} ${label} 새로고침 중`});try{let r=[];for(let e of sources)r.push(...await $e(e));r=r.map(t=>({...t,campaignMonth:e.find(e=>e.id===t.id)?.campaignMonth||t.campaignMonth}));let i=r.filter(e=>(e.campaignMonth||ln(Dt(e,new Date))).slice(0,7)===month),a=Gt([...e.filter(e=>(e.campaignMonth||ln(Dt(e,new Date))).slice(0,7)!==month||source&&e.section!==source),...i]);if(!i.length)throw Error(`No rows for selected month`);t(a),x(``),localStorage.setItem(be,JSON.stringify(a)),D({type:`ok`,text:`${month.replace(`-`,`.`)} ${label} 업데이트 완료: ${i.length}개`})}catch(n){console.warn(`Sheet refresh failed`,n),D({type:`bad`,text:`${label} 새로고침 실패: 기존 데이터 유지`})}finally{se.current=!1,T(!1)}}}
 function Ae(e,t){r(n=>({...n,[e]:{...n[e]||{},...t}}))}
 function je(e,t){Ae(e,t),ne(n=>n?.id===e?yt(n,t):n)}
@@ -652,7 +652,7 @@ function Ve({onOpen:e}){function t(t){(t.key===`Enter`||t.key===` `)&&e()}return
 (0,A.jsx)(`div`,{className:`intro-object intro-folder intro-folder-sky`,children:
 (0,A.jsx)(`span`,{})})]}),
 (0,A.jsx)(`div`,{className:`intro-shelf`,"aria-hidden":`true`})]})}
-function He({group:e,onSelect:t,updateTaskManual:n,instagramPlan:r,setInstagramPlan:i,instagramMonth:m}){let a=e.title.includes(`BGF LIVE`),o=e.title.includes(`동국 뷰티`),s=e.title===Le,[c,l]=(0,S.useState)(!1),[u,d]=(0,S.useState)(!1);function f(e){if(a){let t=new Date(e.publishDate);return!!e.publishDate&&!Number.isNaN(t.getTime())&&dn(t)<dn(new Date)}return!!o&&(e.progressOptions?.length||0)>0&&jt(e)>=e.progressOptions.length-1}return s?
+function He({group:e,onSelect:t,updateTaskManual:n,instagramPlan:r,setInstagramPlan:i,instagramMonth:m}){let a=e.title.includes(`BGF LIVE`),o=e.title.includes(`동국 뷰티`),s=e.title===Le,[c,l]=(0,S.useState)(!1);function f(e){if(a){let t=new Date(e.publishDate);return!!e.publishDate&&!Number.isNaN(t.getTime())&&dn(t)<dn(new Date)}return!!o&&(e.progressOptions?.length||0)>0&&jt(e)>=e.progressOptions.length-1}return s?
 (0,A.jsxs)(`section`,{className:`project-section`,children:[
 (0,A.jsx)(`div`,{className:`project-title`,children:
 (0,A.jsxs)(`div`,{className:`project-title-main`,children:[
@@ -677,11 +677,7 @@ function He({group:e,onSelect:t,updateTaskManual:n,instagramPlan:r,setInstagramP
 (0,A.jsx)(ce,{size:26}),
 (0,A.jsx)(`h2`,{children:e.title}),o&&
 (0,A.jsxs)(`button`,{className:`full-schedule-button`,type:`button`,onClick:()=>l(e=>!e),children:[
-(0,A.jsx)(ie,{size:16}),c?`표로 보기`:`전체 일정`]}),a&&
-(0,A.jsxs)(`button`,{className:`instagram-button`,type:`button`,onClick:()=>d(!0),"aria-label":`Instagram`,children:[
-(0,A.jsx)(`img`,{src:`./instagram-logo.png`,alt:``}),
-(0,A.jsx)(`span`,{children:`인스타그램`})]})]})}),a&&u&&
-(0,A.jsx)(Ue,{plan:r,setPlan:i,month:m,onClose:()=>d(!1)}),o&&c&&
+(0,A.jsx)(ie,{size:16}),c?`표로 보기`:`전체 일정`]})]})}),o&&c&&
 (0,A.jsx)(We,{tasks:e.items,onSelect:t}),
 (0,A.jsxs)(`div`,{className:`task-table ${a?`bgf-table`:``} ${o?`dongguk-table`:``} ${c?`is-hidden`:``}`,children:[
 (0,A.jsxs)(`div`,{className:`task-table-head`,children:[a&&
@@ -697,8 +693,10 @@ function He({group:e,onSelect:t,updateTaskManual:n,instagramPlan:r,setInstagramP
 (0,A.jsx)(`select`,{className:`category-select category-${Vt(e.category)}`,value:e.category||Pe[0],onChange:t=>n(e.id,{category:t.target.value}),onClick:e=>e.stopPropagation(),children:Pe.map(e=>
 (0,A.jsx)(`option`,{value:e,children:e},e))}),
 (0,A.jsxs)(`strong`,{className:a?`bgf-content-cell`:``,children:[
-(0,A.jsx)(`span`,{children:Wt(e.title)}),a&&e.coverageType===`촬영`&&(e.shootingDate||e.shootingLocation)&&
-(0,A.jsxs)(`em`,{className:`shooting-meta-pill`,children:[`📸 `,e.shootingDate,` `,e.shootingLocation]})]}),a&&
+(0,A.jsx)(`span`,{children:Wt(e.title)}),a&&e.instagramEnabled&&
+(0,A.jsx)(`img`,{className:`bgf-instagram-symbol`,src:`./instagram-logo.png`,alt:`Instagram`}),a&&e.coverageType===`촬영`&&(e.shootingDate||e.shootingLocation)&&
+(0,A.jsxs)(`em`,{className:`shooting-meta-pill`,children:[`📸 `,e.shootingDate,` `,e.shootingLocation,e.instagramEnabled&&
+(0,A.jsx)(`img`,{className:`bgf-instagram-symbol bgf-instagram-symbol-inline`,src:`./instagram-logo.png`,alt:`Instagram`})]})]}),a&&
 (0,A.jsx)(`span`,{className:`coverage-cell`,onClick:e=>e.stopPropagation(),children:
 (0,A.jsxs)(`select`,{value:e.coverageType||`서면 인터뷰`,onChange:t=>n(e.id,{coverageType:t.target.value,completedProgressIndex:Math.min(jt(e),St(t.target.value).length-1)}),"aria-label":`취재/촬영 유형`,children:[
 (0,A.jsx)(`option`,{value:`촬영`,children:`촬영`}),
@@ -923,6 +921,9 @@ r&&
 (0,A.jsxs)(`label`,{className:`bgf-publish-date-editor`,children:[
 (0,A.jsx)(`span`,{children:`발행일`}),
 (0,A.jsx)(`input`,{type:`date`,value:e.publishDate||``,onChange:t=>n(e.id,{publishDate:t.target.value})})]}),
+(0,A.jsxs)(`label`,{className:`bgf-instagram-toggle`,children:[
+(0,A.jsx)(`input`,{type:`checkbox`,checked:!!e.instagramEnabled,onChange:t=>n(e.id,{instagramEnabled:t.target.checked})}),
+(0,A.jsx)(`span`,{children:`인스타그램`})]}),
 (0,A.jsxs)(`div`,{children:[
 (0,A.jsx)(`span`,{children:`콘텐츠 내용`}),
 (0,A.jsx)(`textarea`,{className:`bgf-detail-input`,value:e.detail||``,onChange:t=>n(e.id,{detail:t.target.value}),placeholder:`콘텐츠 내용을 입력하세요`,rows:8})]})]}),
@@ -971,7 +972,7 @@ function gt(e,t=[]){let n=new Date(ke);return t.reduce((t,r,i)=>{let a=(e||[]).f
 function _t(e){let t=String(e||``).trim().replace(/\s+/g,` `);return/업로드|마감/i.test(t)?`업로드 보고`:/원고\s*초안|초안\s*전달|원고\s*전달|초안\s*검수/i.test(t)?`초안 검수`:/체험단\s*모집\s*시작|캠페인\s*세팅/i.test(t)?`캠페인 세팅`:/체험단\s*선정/i.test(t)?`리스트 전달`:/제품\s*(?:발송|배송)/i.test(t)?`배송정보 전달`:/리스트.*가이드/i.test(t)?`리스트/가이드 전달`:/리스트\s*전달/i.test(t)?`리스트 전달`:t}
 function vt(e,t,n){let r=String(n||``).split(`
 `)[0].replace(/체험단\s*/g,``).replace(/\s+/g,` `).trim();return`${t||`캠페인`}${r?` / ${r}`:``}`}
-function yt(e,t={}){if(bt(e)){let n=xt(e),r=t.coverageType??n.coverageType,i=St(r),a=Number.isInteger(t.completedProgressIndex)?t.completedProgressIndex:n.completedProgressIndex??-1;return{...n,title:t.title??n.title,detail:t.detail??n.detail,assignee:t.assignee??n.assignee,issueNote:t.issueNote??n.issueNote??``,coverageType:r,shootingDate:t.shootingDate??n.shootingDate,shootingLocation:t.shootingLocation??n.shootingLocation??``,publishDate:t.publishDate??n.publishDate,dueDates:t.dueDates??n.dueDates??{},schedule:At(n.schedule||[],t.dueDates||n.dueDates||{}),completedProgressIndex:Math.min(Math.max(a,-1),i.length-1),progressOptions:i}}let n=t.category??e.category??Bt(e.platform,e.product,e.detail),r=Pt(n),i=Number.isInteger(t.completedProgressIndex)?t.completedProgressIndex:typeof t.selectedProgress==`string`?Math.max(-1,r.indexOf(t.selectedProgress)-1):e.completedProgressIndex??-1;return{...e,title:t.title??e.title,brand:t.brand??e.brand,detail:t.detail??e.detail??``,deleted:t.deleted??e.deleted??!1,issueNote:t.issueNote??e.issueNote??``,progressNote:t.progressNote??e.progressNote??``,category:n,assignee:t.assignee??e.assignee,progressOptions:r,dueDates:t.dueDates??e.dueDates??{},schedule:At(e.schedule||[],t.dueDates||e.dueDates||{}),completedProgressIndex:i}}
+function yt(e,t={}){if(bt(e)){let n=xt(e),r=t.coverageType??n.coverageType,i=St(r),a=Number.isInteger(t.completedProgressIndex)?t.completedProgressIndex:n.completedProgressIndex??-1;return{...n,title:t.title??n.title,detail:t.detail??n.detail,assignee:t.assignee??n.assignee,issueNote:t.issueNote??n.issueNote??``,coverageType:r,shootingDate:t.shootingDate??n.shootingDate,shootingLocation:t.shootingLocation??n.shootingLocation??``,publishDate:t.publishDate??n.publishDate,instagramEnabled:t.instagramEnabled??n.instagramEnabled??!1,dueDates:t.dueDates??n.dueDates??{},schedule:At(n.schedule||[],t.dueDates||n.dueDates||{}),completedProgressIndex:Math.min(Math.max(a,-1),i.length-1),progressOptions:i}}let n=t.category??e.category??Bt(e.platform,e.product,e.detail),r=Pt(n),i=Number.isInteger(t.completedProgressIndex)?t.completedProgressIndex:typeof t.selectedProgress==`string`?Math.max(-1,r.indexOf(t.selectedProgress)-1):e.completedProgressIndex??-1;return{...e,title:t.title??e.title,brand:t.brand??e.brand,detail:t.detail??e.detail??``,deleted:t.deleted??e.deleted??!1,issueNote:t.issueNote??e.issueNote??``,progressNote:t.progressNote??e.progressNote??``,category:n,assignee:t.assignee??e.assignee,progressOptions:r,dueDates:t.dueDates??e.dueDates??{},schedule:At(e.schedule||[],t.dueDates||e.dueDates||{}),completedProgressIndex:i}}
 function bt(e){return String(e.section||``).includes(`BGF LIVE`)}
 function xt(e){let t=e.contentCategory||wt(e.title)||`BGF LIVE`,n=ot(e.detail)||Tt(e.title)||Wt(e.title),r=Ct(e.schedule||[]),i=e.coverageType?{type:e.coverageType,date:e.shootingDate||``}:ft([e.detail,e.schedule?.map(e=>e.label).join(` `)].filter(Boolean).join(`
 `));return{...e,title:n,product:n,platform:`BGF LIVE`,keyword:e.keyword||t,keywordTags:e.keywordTags||at(e.keyword||``),contentCategory:t,coverageType:i.type,shootingDate:i.date,shootingLocation:e.shootingLocation||``,publishDate:e.publishDate||st(r),category:`글로브`,progressOptions:St(i.type),schedule:r}}

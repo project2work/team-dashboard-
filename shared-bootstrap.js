@@ -1,6 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js?v=20260722-1";
 
-const DASHBOARD_MODULE = "./team-dashboard.js?v=20260804-1";
+const DASHBOARD_MODULE = "./team-dashboard.js?v=20260805-1";
 const COLLECTION = "team-dashboard-state";
 const SHARED_LOGIN_EMAIL = "dashboard@project2work.com";
 const BACKUP_KEY = "teamDashboardBackupBeforeSharedV1";
