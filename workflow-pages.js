@@ -6,7 +6,7 @@
   const MANUAL_EVENTS_KEY = "teamDashboardManualEventsV1";
   const VACATION_EVENT_PREFIX = "vacation-table-";
   const PAGE_CLASS = "addon-page-active";
-  const PROCESS_GROUPS = ["기획 프로세스", "촬영 취재 유의사항", "이벤트", "광고", "비용처리", "링크트리"];
+  const PROCESS_GROUPS = ["기획 프로세스", "촬영 취재 유의사항", "이벤트", "광고", "비용처리", "월간 보고", "기타"];
   const VACATION_DATE_SLOTS = 20;
   let activePage = "";
   const saveTimers = new Map();
@@ -34,7 +34,8 @@
     { group: "광고", phase: "광고", task: "광고 운영", timing: "캠페인별", detail: "광고 운영 일정과 결과를 기재" },
     { group: "비용처리", phase: "비용처리", task: "견적서/전월 증빙서류 전달", timing: "매월 첫째주", detail: "BGF와 BGF리테일 비용을 각각 구분하여 처리" },
     { group: "비용처리", phase: "비용처리", task: "당월 세금계산서 발행", timing: "매월 25일", detail: "발행 후 담당자에게 공유" },
-    { group: "링크트리", phase: "링크트리", task: "링크 및 계정 관리", timing: "필요 시", detail: "공개 가능한 링크만 기재하고 비밀번호는 내부 문서에서 관리" }
+    { id: "workflow-monthly-report", group: "월간 보고", phase: "월간 보고", task: "월간 보고", timing: "매월", detail: "" },
+    { group: "기타", phase: "링크트리", task: "링크 및 계정 관리", timing: "필요 시", detail: "공개 가능한 링크만 기재하고 비밀번호는 내부 문서에서 관리" }
   ];
 
   function clone(value) {
@@ -54,6 +55,8 @@
     const compact = String(value || "").replace(/\s+/g, "").replaceAll("/", "");
     if (compact === "촬영취재유의사항") return "촬영 취재 유의사항";
     if (compact === "비용처리") return "비용처리";
+    if (compact === "링크트리" || compact === "기타") return "기타";
+    if (compact === "월간보고") return "월간 보고";
     return PROCESS_GROUPS.includes(value) ? value : "기획 프로세스";
   }
 
@@ -68,7 +71,24 @@
     };
   }
 
-  let processRows = parseStored(PROCESS_KEY, DEFAULT_PROCESS_ROWS).map(normalizeProcessRow);
+  function normalizeProcessRows(rows) {
+    const normalized = rows.map(normalizeProcessRow);
+    if (!normalized.some((row) => row.group === "월간 보고")) {
+      const monthlyRow = normalizeProcessRow({
+        id: "workflow-monthly-report",
+        group: "월간 보고",
+        phase: "월간 보고",
+        task: "월간 보고",
+        timing: "매월",
+        detail: ""
+      });
+      const miscIndex = normalized.findIndex((row) => row.group === "기타");
+      normalized.splice(miscIndex < 0 ? normalized.length : miscIndex, 0, monthlyRow);
+    }
+    return normalized;
+  }
+
+  let processRows = normalizeProcessRows(parseStored(PROCESS_KEY, DEFAULT_PROCESS_ROWS));
   let vacationRows = parseStored(VACATION_KEY, [{
     id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
   }]).map(normalizeVacationRow);
@@ -227,7 +247,7 @@
   }
 
   function showPage(page) {
-    processRows = parseStored(PROCESS_KEY, DEFAULT_PROCESS_ROWS).map(normalizeProcessRow);
+    processRows = normalizeProcessRows(parseStored(PROCESS_KEY, DEFAULT_PROCESS_ROWS));
     vacationRows = parseStored(VACATION_KEY, [{
       id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
     }]).map(normalizeVacationRow);
@@ -467,7 +487,7 @@
   window.addEventListener("dashboard-shared-state", (event) => {
     const { key, value } = event.detail || {};
     try {
-      if (key === PROCESS_KEY) processRows = JSON.parse(value).map(normalizeProcessRow);
+      if (key === PROCESS_KEY) processRows = normalizeProcessRows(JSON.parse(value));
       if (key === VACATION_KEY) {
         vacationRows = JSON.parse(value).map(normalizeVacationRow);
         syncVacationCalendar();
