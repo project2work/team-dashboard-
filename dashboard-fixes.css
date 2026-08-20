@@ -813,6 +813,34 @@ textarea {
   accent-color: #e25293;
 }
 
+.bgf-instagram-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.bgf-instagram-date {
+  display: grid;
+  grid-template-columns: auto 150px;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  color: #a92f6b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bgf-instagram-date input {
+  width: 150px;
+  height: 34px;
+  padding: 0 9px;
+  color: #2f3438;
+  border: 1px solid #f0cade;
+  border-radius: 8px;
+  background: #fff;
+}
+
 .bgf-instagram-symbol {
   flex: none;
   box-sizing: border-box;
