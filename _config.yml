@@ -1,1 +1,2 @@
-
+exclude:
+  - FIREBASE_SETUP_KO.md
