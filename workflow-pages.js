@@ -3,12 +3,15 @@
 
   const PROCESS_KEY = "teamDashboardBgfWorkflowV1";
   const VACATION_KEY = "teamDashboardVacationStatusV1";
+  const MANUAL_EVENTS_KEY = "teamDashboardManualEventsV1";
+  const VACATION_EVENT_PREFIX = "vacation-table-";
   const PAGE_CLASS = "addon-page-active";
   const PROCESS_GROUPS = ["기획 프로세스", "촬영 취재 유의사항", "이벤트", "광고", "비용처리", "링크트리"];
   const VACATION_DATE_SLOTS = 10;
   let activePage = "";
   const saveTimers = new Map();
   let observerBusy = false;
+  let calendarSyncedOnce = false;
 
   const DEFAULT_PROCESS_ROWS = [
     { group: "기획 프로세스", phase: "1. 스케줄링", task: "월간 스케줄링", timing: "전월 24~26일", detail: "기획 회의 전달 및 BGF 자료 수령\n4글자 내외의 짧은 컨셉 문구 작성\n촬영·디자인 요청과 원고 작성 일정을 고려하여 스케줄링" },
@@ -98,6 +101,61 @@
     }, 180));
   }
 
+  function vacationCalendarDate(value) {
+    const text = String(value || "").trim();
+    const iso = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    const short = text.match(/^(\d{1,2})\s*[/.\-]\s*(\d{1,2})$/);
+    const year = iso ? Number(iso[1]) : new Date().getFullYear();
+    const month = Number(iso ? iso[2] : short?.[1]);
+    const day = Number(iso ? iso[3] : short?.[2]);
+    if (!year || !month || !day) return "";
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return "";
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  function syncVacationCalendar() {
+    const raw = localStorage.getItem(MANUAL_EVENTS_KEY);
+    if (raw === null) return;
+    let existing;
+    try {
+      existing = JSON.parse(raw);
+    } catch {
+      existing = [];
+    }
+    if (!Array.isArray(existing)) existing = [];
+    const manualEvents = existing.filter((event) => !String(event?.id || "").startsWith(VACATION_EVENT_PREFIX));
+    const generated = [];
+    const seen = new Set();
+    vacationRows.forEach((row) => {
+      [
+        { key: "annualDates", token: "annual", label: "연차" },
+        { key: "halfDates", token: "half", label: "반차" }
+      ].forEach(({ key, token, label }) => {
+        row[key].forEach((value) => {
+          const date = vacationCalendarDate(value);
+          const unique = `${row.id}-${token}-${date}`;
+          if (!date || seen.has(unique)) return;
+          seen.add(unique);
+          generated.push({
+            id: `${VACATION_EVENT_PREFIX}${unique}`,
+            date,
+            type: "휴가",
+            title: `${String(row.name || "성명 미입력").trim() || "성명 미입력"} ${label}`,
+            source: "vacation-status"
+          });
+        });
+      });
+    });
+    generated.sort((left, right) => left.date.localeCompare(right.date) || left.title.localeCompare(right.title, "ko"));
+    const serialized = JSON.stringify([...manualEvents, ...generated]);
+    if (serialized === raw) return;
+    localStorage.setItem(MANUAL_EVENTS_KEY, serialized);
+    window.dispatchEvent(new CustomEvent("dashboard-shared-state", {
+      detail: { key: MANUAL_EVENTS_KEY, value: serialized }
+    }));
+  }
+
   function create(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -142,6 +200,15 @@
         button.dataset.addonCloseBound = "true";
         button.addEventListener("click", hideAddonPage);
       });
+      if (!calendarSyncedOnce) {
+        calendarSyncedOnce = true;
+        window.setTimeout(() => {
+          vacationRows = parseStored(VACATION_KEY, [{
+            id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
+          }]).map(normalizeVacationRow);
+          syncVacationCalendar();
+        }, 120);
+      }
       if (activePage) {
         document.body.classList.add(PAGE_CLASS);
         nav.querySelectorAll("button").forEach((button) => {
@@ -164,6 +231,7 @@
     vacationRows = parseStored(VACATION_KEY, [{
       id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
     }]).map(normalizeVacationRow);
+    syncVacationCalendar();
     activePage = page;
     const existing = document.querySelector(".addon-page");
     if (existing) existing.remove();
@@ -290,9 +358,13 @@
       row[type][index] = input.value;
       persist(VACATION_KEY, vacationRows);
     });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") input.blur();
+    });
     input.addEventListener("blur", () => {
       row[type][index] = shortDate(input.value);
       localStorage.setItem(VACATION_KEY, JSON.stringify(vacationRows));
+      syncVacationCalendar();
       renderActivePage(page);
     });
     td.append(input);
@@ -344,7 +416,11 @@
         if (lineIndex === 0) {
           const order = create("td", "vacation-sticky-cell", String(rowIndex + 1)); order.rowSpan = 2; tr.append(order);
           const nameCell = document.createElement("td"); nameCell.rowSpan = 2;
-          nameCell.append(field("input", row.name, "성명", (value) => { row.name = value; persist(VACATION_KEY, vacationRows); })); tr.append(nameCell);
+          nameCell.append(field("input", row.name, "성명", (value) => {
+            row.name = value;
+            persist(VACATION_KEY, vacationRows);
+            syncVacationCalendar();
+          })); tr.append(nameCell);
           const totalCell = create("td", "vacation-allowance"); totalCell.rowSpan = 2;
           const totalInput = field("input", row.total, `${row.name || "직원"} 연차 총 개수`, (value) => {
             row.total = value;
@@ -369,6 +445,7 @@
           remove.addEventListener("click", () => {
             vacationRows = vacationRows.filter((item) => item.id !== row.id);
             localStorage.setItem(VACATION_KEY, JSON.stringify(vacationRows));
+            syncVacationCalendar();
             renderActivePage(container);
           });
           actions.append(remove); tr.append(actions);
@@ -381,6 +458,7 @@
     add.addEventListener("click", () => {
       vacationRows.push(normalizeVacationRow({ id: crypto.randomUUID() }));
       localStorage.setItem(VACATION_KEY, JSON.stringify(vacationRows));
+      syncVacationCalendar();
       renderActivePage(container);
     });
     container.append(wrap, add);
@@ -390,7 +468,10 @@
     const { key, value } = event.detail || {};
     try {
       if (key === PROCESS_KEY) processRows = JSON.parse(value).map(normalizeProcessRow);
-      if (key === VACATION_KEY) vacationRows = JSON.parse(value).map(normalizeVacationRow);
+      if (key === VACATION_KEY) {
+        vacationRows = JSON.parse(value).map(normalizeVacationRow);
+        syncVacationCalendar();
+      }
       const page = document.querySelector(".addon-page");
       if (page && ((key === PROCESS_KEY && activePage === "process") || (key === VACATION_KEY && activePage === "vacation"))) {
         renderActivePage(page);
