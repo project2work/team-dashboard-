@@ -1041,17 +1041,16 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 }
 
 .vacation-table {
-  min-width: 1340px;
+  min-width: 1230px;
 }
 
-.vacation-col-order { width: 42px; }
-.vacation-col-name { width: 82px; }
-.vacation-col-allowance { width: 70px; }
-.vacation-col-kind { width: 58px; }
+.vacation-col-name { width: 68px; }
+.vacation-col-allowance { width: 54px; }
+.vacation-col-kind { width: 54px; }
 .vacation-col-date { width: 42px; }
-.vacation-col-count { width: 58px; }
-.vacation-col-used { width: 64px; }
-.vacation-col-remaining { width: 70px; }
+.vacation-col-count { width: 48px; }
+.vacation-col-used { width: 50px; }
+.vacation-col-remaining { width: 58px; }
 .vacation-col-manage { width: 56px; }
 
 .vacation-table th {
@@ -1061,10 +1060,12 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   padding: 8px 7px;
   font-size: 12px;
   font-weight: 900;
+  line-height: 1.25;
+  white-space: pre-line;
 }
 
-.vacation-table thead tr:first-child th:nth-child(3) { background: #d9eaf5; }
-.vacation-table thead tr:first-child th:nth-child(8) { background: #f2d7e2; }
+.vacation-table thead tr:first-child th:nth-child(2) { background: #d9eaf5; }
+.vacation-table thead tr:first-child th:nth-child(7) { background: #f2d7e2; }
 
 .vacation-table .vacation-date-number {
   height: 25px;

@@ -398,14 +398,14 @@
     const wrap = create("div", "vacation-table-wrap");
     const table = create("table", "vacation-table");
     const colgroup = document.createElement("colgroup");
-    ["order", "name", "allowance", "kind", ...Array(VACATION_DATE_SLOTS).fill("date"), "count", "used", "remaining", "manage"].forEach((name) => {
+    ["name", "allowance", "kind", ...Array(VACATION_DATE_SLOTS).fill("date"), "count", "used", "remaining", "manage"].forEach((name) => {
       const col = document.createElement("col");
       col.className = `vacation-col-${name}`;
       colgroup.append(col);
     });
     const head = document.createElement("thead");
     const trh = document.createElement("tr");
-    ["순번", "성명", "연차 총 개수", "구분"].forEach((label) => {
+    ["성명", "연차\n총 개수", "구분"].forEach((label) => {
       const th = create("th", "", label);
       th.rowSpan = 2;
       trh.append(th);
@@ -413,7 +413,7 @@
     const dateHeading = create("th", "vacation-date-heading", "사용일자");
     dateHeading.colSpan = VACATION_DATE_SLOTS;
     trh.append(dateHeading);
-    ["사용 개수", "사용 합계", "잔여 휴가", "관리"].forEach((label) => {
+    ["사용\n개수", "사용\n합계", "잔여\n휴가", "관리"].forEach((label) => {
       const th = create("th", "", label);
       th.rowSpan = 2;
       trh.append(th);
@@ -422,7 +422,7 @@
     Array.from({ length: VACATION_DATE_SLOTS }, (_, index) => dateNumbers.append(create("th", "vacation-date-number", String(index + 1))));
     head.append(trh, dateNumbers);
     const body = document.createElement("tbody");
-    vacationRows.forEach((row, rowIndex) => {
+    vacationRows.forEach((row) => {
       const annualCount = usedDates(row.annualDates);
       const halfCount = usedDates(row.halfDates);
       const usedTotal = annualCount + halfCount * 0.5;
@@ -434,7 +434,6 @@
       ].forEach((line, lineIndex) => {
         const tr = document.createElement("tr");
         if (lineIndex === 0) {
-          const order = create("td", "vacation-sticky-cell", String(rowIndex + 1)); order.rowSpan = 2; tr.append(order);
           const nameCell = document.createElement("td"); nameCell.rowSpan = 2;
           nameCell.append(field("input", row.name, "성명", (value) => {
             row.name = value;
