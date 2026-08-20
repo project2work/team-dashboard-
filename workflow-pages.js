@@ -7,7 +7,7 @@
   const VACATION_EVENT_PREFIX = "vacation-table-";
   const PAGE_CLASS = "addon-page-active";
   const PROCESS_GROUPS = ["기획 프로세스", "촬영 취재 유의사항", "이벤트", "광고", "비용처리", "링크트리"];
-  const VACATION_DATE_SLOTS = 10;
+  const VACATION_DATE_SLOTS = 20;
   let activePage = "";
   const saveTimers = new Map();
   let observerBusy = false;
