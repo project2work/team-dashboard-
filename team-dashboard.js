@@ -874,6 +874,7 @@ function d(){let e=c.text.trim(),t=c.note.trim();!e&&!t||(r({text:e||`새 항목
 (0,A.jsx)(`input`,{type:`checkbox`,checked:e.done,onChange:t=>a(e.id,{done:t.target.checked})}),
 (0,A.jsx)(`span`,{className:e.done?`done check-text`:`check-text`,children:e.text||`항목 입력`}),
 (0,A.jsx)(`span`,{className:`check-note`,children:e.note||`설명 입력`})]},e.id))}),
+(0,A.jsx)(`button`,{className:`check-card-add-button`,type:`button`,onClick:()=>r({text:`새 항목`,note:``}),children:`+ 항목 추가`}),
 (0,A.jsxs)(`label`,{className:`check-memo`,children:[
 (0,A.jsx)(`span`,{children:`MEMO`}),
 (0,A.jsx)(`textarea`,{value:t,onChange:e=>n(e.target.value),placeholder:`메모를 자유롭게 입력`,rows:4})]}),u&&

@@ -1191,6 +1191,26 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   font-weight: 900;
 }
 
+.vacation-count {
+  border-right: 1px solid #c2ccd1 !important;
+}
+
+.vacation-total {
+  position: relative;
+  border-left: 1px solid #c2ccd1 !important;
+}
+
+.vacation-total::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  width: 1px;
+  background: #c2ccd1;
+  pointer-events: none;
+}
+
 .vacation-remaining {
   color: #80304f;
   background: #f4dce6 !important;
@@ -1215,4 +1235,16 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   .addon-page-header h1 {
     font-size: 24px;
   }
+}
+
+.check-card-add-button {
+  width: 100%;
+  height: 34px;
+  margin-top: 10px;
+  color: #24664d;
+  border: 1px dashed #8ac4a8;
+  border-radius: 8px;
+  background: #f7fcf9;
+  font-size: 12px;
+  font-weight: 900;
 }
