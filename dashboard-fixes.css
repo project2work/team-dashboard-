@@ -1069,16 +1069,16 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 }
 
 .vacation-table {
-  min-width: 1230px;
+  min-width: 1232px;
 }
 
 .vacation-col-name { width: 68px; }
-.vacation-col-allowance { width: 54px; }
+.vacation-col-allowance { width: 60px; }
 .vacation-col-kind { width: 54px; }
 .vacation-col-date { width: 42px; }
 .vacation-col-count { width: 48px; }
 .vacation-col-used { width: 50px; }
-.vacation-col-remaining { width: 58px; }
+.vacation-col-remaining { width: 54px; }
 .vacation-col-manage { width: 56px; }
 
 .vacation-table th {
@@ -1094,6 +1094,10 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 
 .vacation-table thead tr:first-child th:nth-child(2) { background: #d9eaf5; }
 .vacation-table thead tr:first-child th:nth-child(7) { background: #f2d7e2; }
+
+.vacation-table thead tr:first-child th:nth-child(7) {
+  font-size: 11px;
+}
 
 .vacation-table .vacation-date-number {
   height: 25px;
@@ -1243,8 +1247,27 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 .vacation-remaining {
   color: #80304f;
   background: #f4dce6 !important;
-  font-size: 15px !important;
+  font-size: 13px !important;
   font-weight: 900;
+}
+
+body.addon-page-active .dashboard-shell,
+body.addon-page-active .dashboard-shell.single-page-shell {
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: 100%;
+  max-width: none;
+  justify-content: stretch;
+}
+
+body.addon-page-active .dashboard-side {
+  display: none !important;
+}
+
+body.addon-page-active .addon-page,
+body.addon-page-active .workflow-table-wrap,
+body.addon-page-active .vacation-table-wrap {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .vacation-remaining.is-negative {
