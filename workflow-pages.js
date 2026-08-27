@@ -107,6 +107,18 @@
     };
   }
 
+  function contentReferenceUrl(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    const candidate = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+    try {
+      const parsed = new URL(candidate);
+      return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+    } catch {
+      return "";
+    }
+  }
+
   function normalizeVacationRow(row) {
     const normalizeSlots = (dates) => Array.from({ length: VACATION_DATE_SLOTS }, (_, index) => shortDate(Array.isArray(dates) ? dates[index] : ""));
     return {
@@ -320,14 +332,32 @@
       subjectInput.placeholder = "주제 입력";
       subjectCell.append(subjectInput);
 
-      const urlCell = create("div", "content-reference-cell");
+      const urlCell = create("div", "content-reference-cell content-reference-url-cell");
+      const openLink = create("a", "content-reference-open-link", "이동 ↗");
+      openLink.target = "_blank";
+      openLink.rel = "noopener noreferrer";
+      openLink.setAttribute("aria-label", "입력한 URL 새 창에서 열기");
+      const syncOpenLink = (value) => {
+        const target = contentReferenceUrl(value);
+        if (target) {
+          openLink.href = target;
+          openLink.classList.remove("is-disabled");
+          openLink.tabIndex = 0;
+        } else {
+          openLink.removeAttribute("href");
+          openLink.classList.add("is-disabled");
+          openLink.tabIndex = -1;
+        }
+      };
       const urlInput = field("input", row.url, "콘텐츠 레퍼런스 URL", (value) => {
         row.url = value;
+        syncOpenLink(value);
         persist(CONTENT_REFERENCE_KEY, contentReferenceRows);
       });
       urlInput.type = "url";
       urlInput.placeholder = "https://";
-      urlCell.append(urlInput);
+      syncOpenLink(row.url);
+      urlCell.append(urlInput, openLink);
 
       const ideaCell = create("div", "content-reference-cell");
       const ideaInput = field("textarea", row.idea, "콘텐츠 레퍼런스 활용 아이디어", (value) => {

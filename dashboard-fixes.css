@@ -1003,6 +1003,38 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   resize: vertical;
 }
 
+.content-reference-url-cell {
+  position: relative;
+}
+
+.content-reference-url-cell input {
+  padding-right: 72px;
+}
+
+.content-reference-open-link {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 29px;
+  color: #21677f;
+  border-radius: 7px;
+  background: var(--blue-strip);
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.content-reference-open-link.is-disabled {
+  color: #abb2b7;
+  background: #f2f4f5;
+  pointer-events: none;
+}
+
 .content-reference-cell input:focus,
 .content-reference-cell textarea:focus {
   background: #f2fbff;
@@ -1046,14 +1078,15 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 .content-reference-row.is-used,
 .content-reference-row.is-used .content-reference-cell input,
 .content-reference-row.is-used .content-reference-cell textarea,
+.content-reference-row.is-used .content-reference-open-link,
 .content-reference-row.is-used .content-reference-use-cell {
   color: #8b9196;
   background: #eef1f3;
 }
 
 .category-moment {
-  color: #276f7e;
-  background: #e6f5f7;
+  color: #a3412f;
+  background: #ffebe5;
 }
 
 .workflow-table-wrap,
