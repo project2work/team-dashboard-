@@ -3,6 +3,7 @@
 
   const PROCESS_KEY = "teamDashboardBgfWorkflowV1";
   const VACATION_KEY = "teamDashboardVacationStatusV1";
+  const CONTENT_REFERENCE_KEY = "teamDashboardContentReferencesV1";
   const MANUAL_EVENTS_KEY = "teamDashboardManualEventsV1";
   const VACATION_EVENT_PREFIX = "vacation-table-";
   const PAGE_CLASS = "addon-page-active";
@@ -92,6 +93,19 @@
   let vacationRows = parseStored(VACATION_KEY, [{
     id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
   }]).map(normalizeVacationRow);
+  let contentReferenceRows = parseStored(CONTENT_REFERENCE_KEY, [{
+    id: crypto.randomUUID(), subject: "", url: "", idea: "", used: false
+  }]).map(normalizeContentReferenceRow);
+
+  function normalizeContentReferenceRow(row) {
+    return {
+      id: row.id || crypto.randomUUID(),
+      subject: String(row.subject || ""),
+      url: String(row.url || ""),
+      idea: String(row.idea || ""),
+      used: Boolean(row.used)
+    };
+  }
 
   function normalizeVacationRow(row) {
     const normalizeSlots = (dates) => Array.from({ length: VACATION_DATE_SLOTS }, (_, index) => shortDate(Array.isArray(dates) ? dates[index] : ""));
@@ -209,6 +223,11 @@
     if (!nav || !main) return;
     observerBusy = true;
     try {
+      if (!nav.querySelector('[data-addon-page="content-reference"]')) {
+        const baseTabs = Array.from(nav.querySelectorAll("button:not(.addon-tab)"));
+        const contentTab = makeTab("콘텐츠 레퍼런스", "content-reference", "▤");
+        nav.insertBefore(contentTab, baseTabs[1] || null);
+      }
       if (!nav.querySelector('[data-addon-page="process"]')) {
         nav.append(makeTab("업무 프로세스", "process", "▦"));
       }
@@ -251,6 +270,9 @@
     vacationRows = parseStored(VACATION_KEY, [{
       id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
     }]).map(normalizeVacationRow);
+    contentReferenceRows = parseStored(CONTENT_REFERENCE_KEY, [{
+      id: crypto.randomUUID(), subject: "", url: "", idea: "", used: false
+    }]).map(normalizeContentReferenceRow);
     syncVacationCalendar();
     activePage = page;
     const existing = document.querySelector(".addon-page");
@@ -267,6 +289,7 @@
 
   function renderActivePage(container) {
     container.replaceChildren();
+    if (activePage === "content-reference") renderContentReferencePage(container);
     if (activePage === "process") renderProcessPage(container);
     if (activePage === "vacation") renderVacationPage(container);
   }
@@ -277,6 +300,77 @@
     copy.append(create("p", "eyebrow", "Team Dashboard"), create("h1", "", title), create("p", "addon-subtitle", subtitle));
     header.append(copy);
     return header;
+  }
+
+  function renderContentReferencePage(container) {
+    container.append(pageHeader("콘텐츠 레퍼런스", "참고할 콘텐츠와 활용 아이디어를 자유롭게 기록할 수 있습니다."));
+    const wrap = create("div", "content-reference-table-wrap");
+    const table = create("div", "content-reference-table");
+    const head = create("div", "content-reference-head");
+    ["주제", "URL", "아이디어", "활용 여부"].forEach((label) => head.append(create("div", "", label)));
+    table.append(head);
+
+    contentReferenceRows.forEach((row) => {
+      const rowNode = create("div", `content-reference-row${row.used ? " is-used" : ""}`);
+      const subjectCell = create("div", "content-reference-cell");
+      const subjectInput = field("input", row.subject, "콘텐츠 레퍼런스 주제", (value) => {
+        row.subject = value;
+        persist(CONTENT_REFERENCE_KEY, contentReferenceRows);
+      });
+      subjectInput.placeholder = "주제 입력";
+      subjectCell.append(subjectInput);
+
+      const urlCell = create("div", "content-reference-cell");
+      const urlInput = field("input", row.url, "콘텐츠 레퍼런스 URL", (value) => {
+        row.url = value;
+        persist(CONTENT_REFERENCE_KEY, contentReferenceRows);
+      });
+      urlInput.type = "url";
+      urlInput.placeholder = "https://";
+      urlCell.append(urlInput);
+
+      const ideaCell = create("div", "content-reference-cell");
+      const ideaInput = field("textarea", row.idea, "콘텐츠 레퍼런스 활용 아이디어", (value) => {
+        row.idea = value;
+        persist(CONTENT_REFERENCE_KEY, contentReferenceRows);
+      });
+      ideaInput.rows = 2;
+      ideaInput.placeholder = "아이디어 입력";
+      ideaCell.append(ideaInput);
+
+      const useCell = create("div", "content-reference-use-cell");
+      const checkLabel = create("label", "content-reference-check");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = row.used;
+      checkbox.setAttribute("aria-label", `${row.subject || "콘텐츠 레퍼런스"} 활용 여부`);
+      checkLabel.append(checkbox, document.createTextNode("활용"));
+      checkbox.addEventListener("change", () => {
+        row.used = checkbox.checked;
+        rowNode.classList.toggle("is-used", row.used);
+        localStorage.setItem(CONTENT_REFERENCE_KEY, JSON.stringify(contentReferenceRows));
+      });
+      const remove = create("button", "content-reference-delete", "삭제");
+      remove.type = "button";
+      remove.addEventListener("click", () => {
+        contentReferenceRows = contentReferenceRows.filter((item) => item.id !== row.id);
+        localStorage.setItem(CONTENT_REFERENCE_KEY, JSON.stringify(contentReferenceRows));
+        renderActivePage(container);
+      });
+      useCell.append(checkLabel, remove);
+      rowNode.append(subjectCell, urlCell, ideaCell, useCell);
+      table.append(rowNode);
+    });
+
+    wrap.append(table);
+    const add = create("button", "addon-add-button", "+ 레퍼런스 추가");
+    add.type = "button";
+    add.addEventListener("click", () => {
+      contentReferenceRows.push(normalizeContentReferenceRow({ id: crypto.randomUUID() }));
+      localStorage.setItem(CONTENT_REFERENCE_KEY, JSON.stringify(contentReferenceRows));
+      renderActivePage(container);
+    });
+    container.append(wrap, add);
   }
 
   function renderProcessPage(container) {
@@ -487,12 +581,13 @@
     const { key, value } = event.detail || {};
     try {
       if (key === PROCESS_KEY) processRows = normalizeProcessRows(JSON.parse(value));
+      if (key === CONTENT_REFERENCE_KEY) contentReferenceRows = JSON.parse(value).map(normalizeContentReferenceRow);
       if (key === VACATION_KEY) {
         vacationRows = JSON.parse(value).map(normalizeVacationRow);
         syncVacationCalendar();
       }
       const page = document.querySelector(".addon-page");
-      if (page && ((key === PROCESS_KEY && activePage === "process") || (key === VACATION_KEY && activePage === "vacation"))) {
+      if (page && ((key === PROCESS_KEY && activePage === "process") || (key === VACATION_KEY && activePage === "vacation") || (key === CONTENT_REFERENCE_KEY && activePage === "content-reference"))) {
         renderActivePage(page);
       }
     } catch (error) {

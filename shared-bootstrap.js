@@ -1,6 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js?v=20260722-1";
 
-const DASHBOARD_MODULE = "./team-dashboard.js?v=20260821-2";
+const DASHBOARD_MODULE = "./team-dashboard.js?v=20260827-1";
 const COLLECTION = "team-dashboard-state";
 const SHARED_LOGIN_EMAIL = "dashboard@project2work.com";
 const BACKUP_KEY = "teamDashboardBackupBeforeSharedV1";
@@ -15,6 +15,7 @@ const SHARED_KEYS = [
   "teamDashboardWeeklyStatusV1",
   "teamDashboardWeeklyGlobalMemoV1",
   "teamDashboardResourcesV1",
+  "teamDashboardContentReferencesV1",
   "teamDashboardInstagramPlanV1",
   "teamDashboardInstagramPlansByMonthV2",
   "teamDashboardBgfWorkflowV1",
@@ -336,7 +337,8 @@ function mergeSharedValue(key, localRaw, remoteRaw) {
   if ([
     "teamDashboardChecksV2",
     "teamDashboardManualEventsV1",
-    "teamDashboardResourcesV1"
+    "teamDashboardResourcesV1",
+    "teamDashboardContentReferencesV1"
   ].includes(key) && Array.isArray(localValue) && Array.isArray(remoteValue)) {
     return JSON.stringify(mergeArrays(localValue, remoteValue));
   }

@@ -932,6 +932,130 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   font-size: 13px;
 }
 
+/* 콘텐츠 레퍼런스 */
+.content-reference-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #cfd6da;
+  background: #fff;
+}
+
+.content-reference-table {
+  min-width: 880px;
+}
+
+.content-reference-head,
+.content-reference-row {
+  display: grid;
+  grid-template-columns: 2fr 4fr 3fr 1fr;
+}
+
+.content-reference-head {
+  min-height: 40px;
+  color: #fff;
+  background: #171717;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.content-reference-head > div,
+.content-reference-row > div {
+  min-width: 0;
+  border-right: 1px solid #cfd6da;
+}
+
+.content-reference-head > div:last-child,
+.content-reference-row > div:last-child {
+  border-right: 0;
+}
+
+.content-reference-head > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 12px;
+}
+
+.content-reference-row {
+  min-height: 58px;
+  border-top: 1px solid #cfd6da;
+  background: #fff;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.content-reference-cell input,
+.content-reference-cell textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 58px;
+  color: var(--ink);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.content-reference-cell textarea {
+  resize: vertical;
+}
+
+.content-reference-cell input:focus,
+.content-reference-cell textarea:focus {
+  background: #f2fbff;
+  box-shadow: inset 0 0 0 2px #76d2f4;
+}
+
+.content-reference-use-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px;
+}
+
+.content-reference-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.content-reference-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: #3a90ff;
+}
+
+.content-reference-delete {
+  height: 29px;
+  color: #bd4a42;
+  border: 0;
+  border-radius: 7px;
+  background: #fff0ee;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.content-reference-row.is-used,
+.content-reference-row.is-used .content-reference-cell input,
+.content-reference-row.is-used .content-reference-cell textarea,
+.content-reference-row.is-used .content-reference-use-cell {
+  color: #8b9196;
+  background: #eef1f3;
+}
+
+.category-moment {
+  color: #276f7e;
+  background: #e6f5f7;
+}
+
 .workflow-table-wrap,
 .vacation-table-wrap {
   width: 100%;
@@ -1265,7 +1389,8 @@ body.addon-page-active .dashboard-side {
 
 body.addon-page-active .addon-page,
 body.addon-page-active .workflow-table-wrap,
-body.addon-page-active .vacation-table-wrap {
+body.addon-page-active .vacation-table-wrap,
+body.addon-page-active .content-reference-table-wrap {
   min-width: 0;
   max-width: 100%;
 }
