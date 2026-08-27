@@ -6,6 +6,12 @@
   const CONTENT_REFERENCE_KEY = "teamDashboardContentReferencesV1";
   const MANUAL_EVENTS_KEY = "teamDashboardManualEventsV1";
   const VACATION_EVENT_PREFIX = "vacation-table-";
+  const CONTENT_REFERENCE_PROPOSERS = [
+    { value: "", label: "제안자 선택" },
+    { value: "김도희", label: "🍋 김도희" },
+    { value: "홍미랑", label: "🍒 홍미랑" },
+    { value: "박현영", label: "🍊 박현영" }
+  ];
   const PAGE_CLASS = "addon-page-active";
   const PROCESS_GROUPS = ["기획 프로세스", "촬영 취재 유의사항", "이벤트", "광고", "비용처리", "월간 보고", "기타"];
   const VACATION_DATE_SLOTS = 20;
@@ -94,7 +100,7 @@
     id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
   }]).map(normalizeVacationRow);
   let contentReferenceRows = parseStored(CONTENT_REFERENCE_KEY, [{
-    id: crypto.randomUUID(), subject: "", url: "", idea: "", used: false
+    id: crypto.randomUUID(), subject: "", url: "", idea: "", proposer: "", used: false
   }]).map(normalizeContentReferenceRow);
 
   function normalizeContentReferenceRow(row) {
@@ -103,6 +109,7 @@
       subject: String(row.subject || ""),
       url: String(row.url || ""),
       idea: String(row.idea || ""),
+      proposer: String(row.proposer || ""),
       used: Boolean(row.used)
     };
   }
@@ -283,7 +290,7 @@
       id: crypto.randomUUID(), name: "", total: "", annualDates: [""], halfDates: [""]
     }]).map(normalizeVacationRow);
     contentReferenceRows = parseStored(CONTENT_REFERENCE_KEY, [{
-      id: crypto.randomUUID(), subject: "", url: "", idea: "", used: false
+      id: crypto.randomUUID(), subject: "", url: "", idea: "", proposer: "", used: false
     }]).map(normalizeContentReferenceRow);
     syncVacationCalendar();
     activePage = page;
@@ -319,7 +326,7 @@
     const wrap = create("div", "content-reference-table-wrap");
     const table = create("div", "content-reference-table");
     const head = create("div", "content-reference-head");
-    ["주제", "URL", "아이디어", "활용 여부"].forEach((label) => head.append(create("div", "", label)));
+    ["주제", "URL", "아이디어", "제안자", "활용 여부"].forEach((label) => head.append(create("div", "", label)));
     table.append(head);
 
     contentReferenceRows.forEach((row) => {
@@ -364,9 +371,25 @@
         row.idea = value;
         persist(CONTENT_REFERENCE_KEY, contentReferenceRows);
       });
-      ideaInput.rows = 2;
+      ideaInput.rows = 1;
       ideaInput.placeholder = "아이디어 입력";
       ideaCell.append(ideaInput);
+
+      const proposerCell = create("div", "content-reference-proposer-cell");
+      const proposerSelect = document.createElement("select");
+      proposerSelect.setAttribute("aria-label", `${row.subject || "콘텐츠 레퍼런스"} 제안자`);
+      CONTENT_REFERENCE_PROPOSERS.forEach((proposer) => {
+        const option = document.createElement("option");
+        option.value = proposer.value;
+        option.textContent = proposer.label;
+        option.selected = row.proposer === proposer.value;
+        proposerSelect.append(option);
+      });
+      proposerSelect.addEventListener("change", () => {
+        row.proposer = proposerSelect.value;
+        localStorage.setItem(CONTENT_REFERENCE_KEY, JSON.stringify(contentReferenceRows));
+      });
+      proposerCell.append(proposerSelect);
 
       const useCell = create("div", "content-reference-use-cell");
       const checkLabel = create("label", "content-reference-check");
@@ -388,7 +411,7 @@
         renderActivePage(container);
       });
       useCell.append(checkLabel, remove);
-      rowNode.append(subjectCell, urlCell, ideaCell, useCell);
+      rowNode.append(subjectCell, urlCell, ideaCell, proposerCell, useCell);
       table.append(rowNode);
     });
 

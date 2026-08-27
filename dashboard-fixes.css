@@ -947,11 +947,11 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 .content-reference-head,
 .content-reference-row {
   display: grid;
-  grid-template-columns: 2fr 4fr 3fr 1fr;
+  grid-template-columns: 1.6fr 2.8fr 3fr 1.35fr 1fr;
 }
 
 .content-reference-head {
-  min-height: 40px;
+  min-height: 30px;
   color: #fff;
   background: #171717;
   font-size: 13px;
@@ -973,11 +973,11 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 12px;
+  padding: 6px 9px;
 }
 
 .content-reference-row {
-  min-height: 58px;
+  min-height: 35px;
   border-top: 1px solid #cfd6da;
   background: #fff;
   transition: background-color 0.18s ease, color 0.18s ease;
@@ -988,15 +988,16 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   display: block;
   width: 100%;
   min-width: 0;
-  min-height: 58px;
+  min-height: 35px;
   color: var(--ink);
   border: 0;
   outline: 0;
   background: transparent;
-  padding: 12px 14px;
+  padding: 6px 9px;
   font: inherit;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.35;
+  text-align: center;
 }
 
 .content-reference-cell textarea {
@@ -1008,19 +1009,19 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 }
 
 .content-reference-url-cell input {
-  padding-right: 72px;
+  padding-right: 61px;
 }
 
 .content-reference-open-link {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 6px;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 50px;
-  height: 29px;
+  min-width: 46px;
+  height: 24px;
   color: #21677f;
   border-radius: 7px;
   background: var(--blue-strip);
@@ -1045,8 +1046,29 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 8px;
+  gap: 6px;
+  padding: 3px 5px;
+}
+
+.content-reference-proposer-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 5px;
+}
+
+.content-reference-proposer-cell select {
+  width: 100%;
+  min-width: 0;
+  height: 29px;
+  color: var(--ink);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  text-align: center;
+  text-align-last: center;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .content-reference-check {
@@ -1059,13 +1081,13 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 }
 
 .content-reference-check input {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   accent-color: #3a90ff;
 }
 
 .content-reference-delete {
-  height: 29px;
+  height: 24px;
   color: #bd4a42;
   border: 0;
   border-radius: 7px;
@@ -1079,6 +1101,8 @@ body.addon-page-active .dashboard-main > :not(.header):not(.page-tabs):not(.addo
 .content-reference-row.is-used .content-reference-cell input,
 .content-reference-row.is-used .content-reference-cell textarea,
 .content-reference-row.is-used .content-reference-open-link,
+.content-reference-row.is-used .content-reference-proposer-cell,
+.content-reference-row.is-used .content-reference-proposer-cell select,
 .content-reference-row.is-used .content-reference-use-cell {
   color: #8b9196;
   background: #eef1f3;
