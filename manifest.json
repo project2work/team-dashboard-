@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Glovv List Connector",
+  "version": "2.2.1",
+  "description": "로그인된 글로브·모먼트·위리뷰에서 지원자 명단을 선정 리스트 추출에 전달합니다.",
+  "permissions": ["scripting", "tabs"],
+  "host_permissions": [
+    "https://brand.glovv.co.kr/*",
+    "https://www.instagram.com/*",
+    "https://brands.momnt.cc/*",
+    "https://biz.wereview.fun/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://glovv-list-maker-kimdh.doheeeeeeeee.chatgpt.site/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "Glovv List Connector"
+  }
+}
