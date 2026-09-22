@@ -906,6 +906,26 @@ textarea {
   box-shadow: none;
 }
 
+.progress-date-input-with-label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.progress-date-input-with-label small {
+  color: #8a9299;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.progress-date-input-with-label input {
+  width: 100%;
+  min-width: 0;
+}
+
 .progress-date-range-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
